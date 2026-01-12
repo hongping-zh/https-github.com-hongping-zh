@@ -1,0 +1,629 @@
+import React, { useState } from 'react';
+import { HardwareSelector, hardwareOptions } from './components/HardwareSelector';
+import { CodeBlock } from './components/CodeBlock';
+import { MetricsCard } from './components/MetricsCard';
+import { DataMoatVisualizer } from './components/DataMoatVisualizer';
+import { ThinkingPanel } from './components/ThinkingPanel';
+import { ImpactTracker } from './components/ImpactTracker';
+import { TradeoffRadar } from './components/TradeoffRadar';
+import { HelpModal } from './components/HelpModal';
+import { Toast, ToastType } from './components/Toast';
+import { analyzeAndOptimizeStream, GeminiError } from './services/geminiService';
+import { moatService } from './services/moatService';
+import { HardwareProfile, AnalysisResult, INITIAL_CODE, EXAMPLES, DEMO_SKETCH } from './types';
+import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip, Legend } from 'recharts';
+import { Leaf, Cpu, Zap, ArrowRight, Activity, Info, Database, Lightbulb, AlertTriangle, CheckCircle2, HelpCircle, ShieldCheck, Share2, Lock, EyeOff, BookOpen, ChevronDown, BrainCircuit, Search, Server, FileText, Bug } from 'lucide-react';
+
+export default function App() {
+  const [code, setCode] = useState(INITIAL_CODE);
+  
+  // P0-1: Correctly initialize from the exported hardwareOptions source of truth.
+  // Index 2 is "Google Edge TPU"
+  const [selectedHw, setSelectedHw] = useState<HardwareProfile>(hardwareOptions[2]);
+  
+  const [inputImage, setInputImage] = useState<string | null>(null);
+  const [isAnalyzing, setIsAnalyzing] = useState(false);
+  const [streamContent, setStreamContent] = useState(''); 
+  const [activePhase, setActivePhase] = useState<string>(''); 
+  const [sandboxUsed, setSandboxUsed] = useState(false); // P0-3: Track if Sandbox actually ran
+  const [result, setResult] = useState<AnalysisResult | null>(null);
+  const [showMoat, setShowMoat] = useState(false);
+  const [feedbackSent, setFeedbackSent] = useState(false);
+  const [privacyMode, setPrivacyMode] = useState(true);
+  const [analysisScope, setAnalysisScope] = useState<'snippet' | 'module'>('snippet');
+  
+  // UI State
+  const [showHelp, setShowHelp] = useState(false);
+  const [toast, setToast] = useState<{ message: string; type: ToastType } | null>(null);
+  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+  const [showAssumptions, setShowAssumptions] = useState(false);
+
+  const showToast = (message: string, type: ToastType) => {
+    setToast({ message, type });
+  };
+
+  const handleAnalyze = async () => {
+    setIsAnalyzing(true);
+    setResult(null);
+    setStreamContent(''); 
+    setActivePhase('');
+    setSandboxUsed(false); // Reset sandbox state
+    setFeedbackSent(false);
+    setShowMoat(false);
+    setShowAssumptions(false);
+    
+    try {
+      const handleChunk = (text: string) => {
+        setStreamContent((prev) => prev + text);
+      };
+
+      const handlePhaseChange = (phase: string) => {
+        setActivePhase(phase);
+        // P0-3: Honest UI Update - Only light up Sandbox if we truly hit the COMPUTE phase
+        if (phase === 'COMPUTE') {
+          setSandboxUsed(true);
+        }
+      };
+
+      const data = await analyzeAndOptimizeStream(code, selectedHw, handleChunk, inputImage || undefined, analysisScope, handlePhaseChange);
+      
+      const layers = data.breakdown.length;
+      const opts = data.recommendations.length;
+      moatService.logAnalysis(layers, opts);
+
+      setResult(data);
+
+      if (data.carbonSavedGrams > 0) {
+        const event = new CustomEvent('impact-update', { detail: data.carbonSavedGrams });
+        window.dispatchEvent(event);
+      }
+      
+      showToast("Optimization Complete!", "success");
+
+    } catch (error: any) {
+      console.error(error);
+      // P0-1: Log error to Moat Service to ensure visualization doesn't freeze
+      moatService.logError();
+      const msg = error instanceof GeminiError ? error.message : "Connection failed. Check GEMINI_API_KEY.";
+      showToast(msg, "error");
+    } finally {
+      setIsAnalyzing(false);
+      setActivePhase(''); // Reset phase
+    }
+  };
+
+  const handleFeedback = () => {
+    setFeedbackSent(true);
+    setTimeout(() => {
+        showToast("AST Pattern Contributed. Thank you!", "success");
+    }, 500);
+  };
+  
+  const handleLoadDemoSketch = () => {
+    setInputImage(DEMO_SKETCH);
+    if (!code.includes("Bottleneck")) {
+        setCode(EXAMPLES['ResNet-50 Block']);
+    }
+    showToast("Loaded Hand-drawn ResNet Sketch", "info");
+  };
+
+  const getConfidenceColor = (score: number) => {
+    if (score >= 0.8) return 'text-green-400 border-green-500/50 bg-green-500/10';
+    if (score >= 0.6) return 'text-yellow-400 border-yellow-500/50 bg-yellow-500/10';
+    return 'text-red-400 border-red-500/50 bg-red-500/10';
+  };
+
+  const getConfidenceBorder = (score: number) => {
+    if (score >= 0.8) return 'border-green-500/30';
+    if (score >= 0.6) return 'border-yellow-500/30';
+    return 'border-red-500/30';
+  };
+
+  return (
+    <div className="min-h-screen bg-[#11111b] text-gray-200 font-sans selection:bg-eco-500/30 flex flex-col">
+      
+      <HelpModal isOpen={showHelp} onClose={() => setShowHelp(false)} />
+      {toast && <Toast message={toast.message} type={toast.type} onClose={() => setToast(null)} />}
+
+      {/* Header */}
+      <header className="border-b border-gray-800 bg-dark-900/50 backdrop-blur-md sticky top-0 z-50">
+        <div className="max-w-7xl mx-auto px-6 h-16 flex items-center justify-between">
+          <div className="flex items-center gap-3">
+            <div className="bg-eco-500/10 p-2 rounded-lg border border-eco-500/20">
+              <Leaf className="w-5 h-5 text-eco-500" />
+            </div>
+            <h1 className="text-xl font-bold tracking-tight text-white">
+              EcoCompute <span className="text-eco-500">AI</span>
+            </h1>
+          </div>
+          <div className="flex items-center gap-4">
+             {/* P0-FIX: Changed hidden lg:flex to hidden md:flex to ensure badges are visible on smaller screens */}
+             <div className="hidden md:flex items-center gap-2">
+                <div className="flex items-center gap-1.5 px-3 py-1 rounded-full bg-blue-500/10 border border-blue-500/20 text-blue-400 text-xs font-medium">
+                  <Search className="w-3 h-3" />
+                  <span>Google Search</span>
+                </div>
+                <div className="flex items-center gap-1.5 px-3 py-1 rounded-full bg-orange-500/10 border border-orange-500/20 text-orange-400 text-xs font-medium">
+                  <Cpu className="w-3 h-3" />
+                  <span>Code Execution</span>
+                </div>
+                <div className="flex items-center gap-1.5 px-3 py-1 rounded-full bg-purple-500/10 border border-purple-500/20 text-purple-400 text-xs font-medium">
+                  <Activity className="w-3 h-3" />
+                  <span>Static AST</span>
+                </div>
+             </div>
+
+             <ImpactTracker />
+             
+             <button 
+               onClick={() => setShowHelp(true)}
+               className="p-2 text-gray-400 hover:text-white transition-colors"
+               title="Documentation"
+             >
+                <BookOpen className="w-5 h-5" />
+             </button>
+
+             <button 
+               onClick={() => setPrivacyMode(!privacyMode)}
+               className={`
+                 flex items-center gap-2 px-3 py-1.5 rounded-full border text-xs font-medium transition-all ml-2
+                 ${privacyMode 
+                   ? 'bg-emerald-900/20 border-emerald-500/50 text-emerald-400' 
+                   : 'bg-gray-800 border-gray-700 text-gray-400 hover:border-gray-500'}
+               `}
+               title={privacyMode ? "Data contribution disabled" : "Contributing anonymized AST data"}
+             >
+               {privacyMode ? <Lock className="w-3 h-3" /> : <EyeOff className="w-3 h-3" />}
+               <span className="hidden sm:inline">{privacyMode ? "Privacy: Strict" : "Privacy: Contributing"}</span>
+             </button>
+          </div>
+        </div>
+      </header>
+
+      <main className="max-w-7xl mx-auto px-6 py-8 flex-1 w-full">
+        <div className="mb-6 flex justify-end">
+           <button 
+             onClick={() => setShowMoat(!showMoat)}
+             className="text-xs text-gray-400 hover:text-eco-400 flex items-center gap-2 transition-colors"
+           >
+             {showMoat ? 'Hide Telemetry' : 'Show Live Telemetry'}
+             <ArrowRight className={`w-3 h-3 transition-transform ${showMoat ? 'rotate-90' : ''}`} />
+           </button>
+        </div>
+
+        {showMoat && (
+          <div className="mb-8 animate-in fade-in slide-in-from-top-4">
+             <DataMoatVisualizer />
+          </div>
+        )}
+
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 h-[calc(100vh-180px)] min-h-[800px]">
+          
+          {/* Left Column */}
+          <div className="lg:col-span-5 flex flex-col gap-6 h-full">
+            <div>
+              <div className="flex items-center gap-2 mb-3 text-sm font-medium text-gray-400">
+                <Cpu className="w-4 h-4" />
+                <span>Target Hardware & Region</span>
+              </div>
+              <HardwareSelector selected={selectedHw} onSelect={setSelectedHw} />
+            </div>
+
+            <div className="flex-1 flex flex-col min-h-0">
+               <div className="flex items-center justify-between mb-3">
+                 <div className="flex items-center gap-2 text-sm font-medium text-gray-400">
+                  <Activity className="w-4 h-4" />
+                  <span>Model Architecture</span>
+                 </div>
+                 
+                 <div className="flex items-center gap-3">
+                    {!isAnalyzing && (
+                      <div className="relative">
+                        <button 
+                          onClick={() => setIsDropdownOpen(!isDropdownOpen)}
+                          className="flex items-center gap-1 text-xs text-eco-400 hover:text-eco-300 transition-colors"
+                        >
+                          Load Example <ChevronDown className={`w-3 h-3 transition-transform ${isDropdownOpen ? 'rotate-180' : ''}`} />
+                        </button>
+                        
+                        {isDropdownOpen && (
+                          <>
+                            <div className="fixed inset-0 z-10" onClick={() => setIsDropdownOpen(false)} />
+                            <div className="absolute right-0 top-full mt-2 w-48 bg-dark-800 border border-gray-700 rounded-lg shadow-xl z-20 animate-in fade-in zoom-in-95 duration-100">
+                              {Object.keys(EXAMPLES).map((key) => (
+                                <button
+                                  key={key}
+                                  onClick={() => {
+                                    setCode(EXAMPLES[key]);
+                                    setIsDropdownOpen(false);
+                                  }}
+                                  className="w-full text-left px-4 py-2 text-xs text-gray-300 hover:bg-gray-700 hover:text-white first:rounded-t-lg last:rounded-b-lg"
+                                >
+                                  {key}
+                                </button>
+                              ))}
+                            </div>
+                          </>
+                        )}
+                      </div>
+                    )}
+
+                    {inputImage && (
+                      <span className="text-xs text-purple-400 animate-pulse">Vision Input Active</span>
+                    )}
+                 </div>
+              </div>
+              <CodeBlock 
+                code={code} 
+                label={inputImage ? "Vision + Code Context" : "PyTorch Source"}
+                isEditable={!isAnalyzing} 
+                onChange={setCode}
+                onImageUpload={setInputImage}
+                onLoadDemoImage={handleLoadDemoSketch}
+                attachedImage={inputImage}
+                onClearImage={() => setInputImage(null)}
+                color="blue"
+                scope={analysisScope}
+                onScopeChange={setAnalysisScope}
+              />
+            </div>
+
+            <button
+              onClick={handleAnalyze}
+              disabled={isAnalyzing}
+              className={`
+                group relative w-full py-4 rounded-xl font-bold text-lg overflow-hidden transition-all
+                ${isAnalyzing ? 'bg-gray-800 cursor-not-allowed' : 'bg-eco-600 hover:bg-eco-500 text-white shadow-[0_0_20px_rgba(22,163,74,0.3)] hover:shadow-[0_0_30px_rgba(22,163,74,0.5)]'}
+              `}
+            >
+              <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-1000" />
+              <div className="flex items-center justify-center gap-3">
+                {isAnalyzing ? (
+                  <>
+                    <Activity className="w-5 h-5 animate-pulse" />
+                    <span>DeepGreen Agent Thinking...</span>
+                  </>
+                ) : (
+                  <>
+                    <Zap className="w-5 h-5 fill-current" />
+                    <span>Deep Energy Audit</span>
+                  </>
+                )}
+              </div>
+            </button>
+            
+            <div className="flex items-start gap-2 text-[10px] text-gray-500 px-1">
+               <ShieldCheck className="w-3 h-3 mt-0.5 text-gray-400" />
+               <p>
+                 Analysis uses <span className="text-purple-400">Smart Static Analysis</span> for structure, <span className="text-blue-400">Google Search</span> for specs, and <span className="text-orange-400">Code Execution</span> for math verification.
+               </p>
+            </div>
+          </div>
+
+          {/* Right Column */}
+          <div className="lg:col-span-7 flex flex-col gap-6 h-full overflow-y-auto pr-1">
+            
+            {isAnalyzing ? (
+              <ThinkingPanel 
+                streamContent={streamContent} 
+                activePhase={activePhase}
+                isSandboxActive={sandboxUsed}
+              />
+            ) : !result ? (
+              <div className="h-full rounded-2xl border-2 border-dashed border-gray-800 bg-dark-800/30 flex flex-col items-center justify-center text-gray-500 gap-4 p-8">
+                <div className="w-20 h-20 rounded-full bg-gray-800/50 flex items-center justify-center">
+                  <Database className="w-10 h-10 opacity-20" />
+                </div>
+                <div className="text-center">
+                  <h3 className="text-lg font-medium text-gray-300">MLPerf Agent + Static AST</h3>
+                  <p className="text-sm max-w-md mt-2 mx-auto">
+                    Paste PyTorch code. The Agent will run <span className="text-eco-400">Structural Pattern Checks</span>, calculate <span className="text-blue-400">GFLOPs</span>, and search for real <span className="text-purple-400">MLPerf data</span>.
+                  </p>
+                </div>
+              </div>
+            ) : (
+              // Results Dashboard
+              <>
+                <div className="flex flex-col gap-2 animate-in fade-in slide-in-from-bottom-4">
+                  {/* Confidence & MLPerf Validation */}
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      <div className={`rounded-xl border p-4 flex items-center justify-between ${getConfidenceColor(result.confidenceScore)}`}>
+                        <div className="flex items-center gap-3">
+                          <AlertTriangle className="w-5 h-5" />
+                          <div>
+                            <div className="text-xs font-bold uppercase opacity-80">Prediction Confidence</div>
+                            <div className="font-bold text-lg">{(result.confidenceScore * 100).toFixed(0)}% Certainty</div>
+                          </div>
+                        </div>
+                      </div>
+
+                      {/* MLPerf Benchmark Validation Card */}
+                      {result.benchmarkData && result.benchmarkData.found ? (
+                        <div className="rounded-xl border border-blue-500/30 bg-blue-500/5 p-4 flex items-center justify-between">
+                            <div className="flex items-center gap-3">
+                                <div className="p-2 bg-blue-500/20 rounded-lg">
+                                    <Server className="w-5 h-5 text-blue-400" />
+                                </div>
+                                <div>
+                                    <div className="text-xs font-bold uppercase text-blue-300">MLPerf Validated</div>
+                                    <div className="text-sm text-gray-200 font-mono">
+                                        {result.benchmarkData.value} ({result.benchmarkData.metric})
+                                    </div>
+                                    <div className="text-[10px] text-gray-500">
+                                        Source: {result.benchmarkData.source}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                      ) : (
+                        <div className="rounded-xl border border-gray-700 bg-dark-800 p-4 flex items-center gap-3 opacity-60">
+                            <Server className="w-5 h-5 text-gray-500" />
+                            <div className="text-sm text-gray-400">No MLPerf Benchmark Found</div>
+                        </div>
+                      )}
+                  </div>
+                  
+                  {/* Wow-2: Transparency & Assumptions (Collapsible Panel) */}
+                  <div className="border border-gray-700 rounded-xl bg-dark-800/30 overflow-hidden">
+                     <button 
+                       onClick={() => setShowAssumptions(!showAssumptions)}
+                       className="w-full flex items-center justify-between p-3 hover:bg-white/5 transition-colors group"
+                     >
+                        <div className="flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-gray-400 group-hover:text-gray-300">
+                           <FileText className="w-4 h-4" />
+                           Transparency & Assumptions
+                        </div>
+                        <ChevronDown className={`w-4 h-4 text-gray-500 transition-transform ${showAssumptions ? 'rotate-180' : ''}`} />
+                     </button>
+                     
+                     {showAssumptions && (
+                        <div className="p-4 border-t border-gray-700 bg-dark-900/80 backdrop-blur-sm text-xs space-y-4 animate-in slide-in-from-top-2">
+                           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                              <div>
+                                <strong className="text-eco-400 block mb-2 font-mono uppercase tracking-wider text-[10px]">1. Simulation Assumptions</strong>
+                                <ul className="space-y-1 text-gray-400 font-mono">
+                                   {result.assumptions?.map((a, i) => <li key={i} className="flex gap-2"><span className="opacity-50">-</span> {a}</li>) || <li>Standard FP32 Precision</li>}
+                                </ul>
+                              </div>
+                              <div>
+                                <strong className="text-blue-400 block mb-2 font-mono uppercase tracking-wider text-[10px]">2. Citations (Live Search)</strong>
+                                <ul className="space-y-1 text-gray-400 font-mono">
+                                   {result.citations?.map((c, i) => <li key={i} className="truncate" title={c}><span className="opacity-50">[{i+1}]</span> {c}</li>) || <li>MLPerf Inference v4.1 Database</li>}
+                                </ul>
+                              </div>
+                           </div>
+                           <div>
+                              <strong className="text-purple-400 block mb-2 font-mono uppercase tracking-wider text-[10px]">3. Energy Model Logic</strong>
+                              <p className="text-gray-400 font-mono leading-relaxed bg-black/20 p-2 rounded border border-gray-800">
+                                {result.energy_model || "E = (GFLOPs / Efficiency) * TDP_Factor * Region_Carbon_Intensity"}
+                              </p>
+                           </div>
+                        </div>
+                     )}
+                  </div>
+                  
+                  {/* Reasoning Trace */}
+                  {result.reasoning_trace && (
+                    <div className="bg-dark-800/80 border border-gray-700 rounded-xl p-4">
+                       <div className="flex items-center gap-2 mb-2 text-purple-400">
+                         <BrainCircuit className="w-4 h-4" />
+                         <span className="text-xs font-bold uppercase tracking-wider">Gemini Thought Trace</span>
+                       </div>
+                       <p className="text-xs text-gray-300 font-mono leading-relaxed whitespace-pre-wrap">
+                         {result.reasoning_trace}
+                       </p>
+                    </div>
+                  )}
+
+                  <div className={`flex gap-3 p-3 rounded-lg bg-dark-800/50 border-l-4 ${getConfidenceBorder(result.confidenceScore)}`}>
+                     <ShieldCheck className="w-5 h-5 text-gray-400 shrink-0" />
+                     <div className="text-sm text-gray-300">
+                       <span className="font-bold text-gray-200 block mb-1">DeepGreen Strategy:</span>
+                       {result.strategyAnalysis}
+                     </div>
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 animate-in fade-in slide-in-from-bottom-5">
+                  <MetricsCard 
+                    title="Estimated Energy" 
+                    value={result.originalEnergyJoules.toFixed(4)} 
+                    unit="J" 
+                  />
+                  <MetricsCard 
+                    title="Optimization" 
+                    value={result.optimizedEnergyJoules.toFixed(4)} 
+                    unit="J" 
+                    color="text-eco-400"
+                    trend="down"
+                    trendValue={`-${result.improvementPercentage}%`}
+                  />
+                   <MetricsCard 
+                    title="Carbon Saved" 
+                    value={result.carbonSavedGrams.toExponential(2)} 
+                    unit="g"
+                    color="text-eco-400"
+                  />
+                  <MetricsCard 
+                    title="Efficiency Score" 
+                    value={Math.min(100, Math.round(100 * (1 + result.improvementPercentage/100))).toString()} 
+                    unit="/ 100"
+                    color="text-blue-400"
+                  />
+                </div>
+                
+                <div className="bg-gradient-to-r from-blue-900/20 to-purple-900/20 border border-blue-500/20 rounded-xl p-3 flex items-center gap-3 animate-in fade-in slide-in-from-bottom-6">
+                   <div className="bg-blue-500/20 p-2 rounded-lg">
+                      <Lightbulb className="w-4 h-4 text-blue-400" />
+                   </div>
+                   <div>
+                     <span className="text-xs text-blue-300 uppercase font-bold tracking-wider">Real World Impact</span>
+                     <p className="text-sm text-gray-200">{result.impactAnalogy}</p>
+                   </div>
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 animate-in fade-in slide-in-from-bottom-7">
+                   {/* Col 1: Bottleneck & Breakdown (Wow-1: Red Card) */}
+                   <div className="flex flex-col gap-4">
+                    {/* Bug Detection Logic */}
+                    {result.bottleneckAnalysis.includes("CRITICAL BUG:") ? (
+                       <div className="bg-red-500/10 p-5 rounded-xl border border-red-500/50 flex-1 relative overflow-hidden animate-pulse">
+                          <div className="absolute top-0 right-0 p-4 opacity-10">
+                             <Bug className="w-24 h-24 text-red-500" />
+                          </div>
+                          <h3 className="flex items-center gap-2 text-red-400 text-sm font-bold uppercase tracking-wider mb-3">
+                             <AlertTriangle className="w-4 h-4" />
+                             Critical Architecture Flaw
+                          </h3>
+                          <p className="text-red-200 text-sm leading-relaxed font-semibold">
+                            {result.bottleneckAnalysis.replace("CRITICAL BUG:", "").trim()}
+                          </p>
+                       </div>
+                    ) : (
+                      <div className="bg-dark-800/50 p-5 rounded-xl border border-gray-800 flex-1">
+                        <h3 className="flex items-center gap-2 text-red-400 text-sm font-bold uppercase tracking-wider mb-3">
+                           Bottleneck Detected
+                        </h3>
+                        <p className="text-gray-300 text-sm leading-relaxed">
+                          {result.bottleneckAnalysis}
+                        </p>
+                      </div>
+                    )}
+
+                     <div className="bg-dark-800/50 p-4 rounded-xl border border-gray-800 flex flex-col flex-1">
+                      <h3 className="text-gray-500 text-xs font-medium uppercase tracking-wider mb-4">Energy Breakdown</h3>
+                      <div className="flex-1 w-full h-[150px]">
+                        <ResponsiveContainer width="100%" height="100%">
+                          <PieChart>
+                            <Pie
+                              data={result.breakdown}
+                              cx="50%"
+                              cy="50%"
+                              innerRadius={40}
+                              outerRadius={60}
+                              paddingAngle={5}
+                              dataKey="joules"
+                              stroke="none"
+                            >
+                              {result.breakdown.map((entry, index) => (
+                                <Cell key={`cell-${index}`} fill={entry.color} />
+                              ))}
+                            </Pie>
+                            <Tooltip 
+                              contentStyle={{ backgroundColor: '#1e1e2e', borderColor: '#374151', borderRadius: '8px' }}
+                              itemStyle={{ color: '#e2e8f0' }}
+                            />
+                            <Legend verticalAlign="bottom" height={36}/>
+                          </PieChart>
+                        </ResponsiveContainer>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Col 2: Decision Triangle */}
+                  {result.tradeoffMetrics && (
+                     <div className="flex flex-col h-full">
+                       <TradeoffRadar metrics={result.tradeoffMetrics} />
+                     </div>
+                  )}
+
+                  {/* Col 3: Optimization Strategy */}
+                  <div className="flex flex-col gap-3">
+                    <h3 className="text-xs font-bold uppercase tracking-wider text-gray-500">Auto-Refactor Strategy</h3>
+                    {result.recommendations.map((rec, idx) => {
+                      let borderColor = 'border-gray-700';
+                      let icon = <HelpCircle className="w-4 h-4 text-gray-500" />;
+                      let bg = 'bg-dark-800/50';
+
+                      if (rec.category === 'High') {
+                        borderColor = 'border-green-500/30';
+                        icon = <CheckCircle2 className="w-4 h-4 text-green-500" />;
+                        bg = 'bg-green-500/5';
+                      } else if (rec.category === 'Medium') {
+                        borderColor = 'border-yellow-500/30';
+                        icon = <Info className="w-4 h-4 text-yellow-500" />;
+                        bg = 'bg-yellow-500/5';
+                      } else {
+                         borderColor = 'border-purple-500/30';
+                         icon = <Zap className="w-4 h-4 text-purple-500" />;
+                         bg = 'bg-purple-500/5';
+                      }
+
+                      return (
+                        <div key={idx} className={`p-3 rounded-lg border ${borderColor} ${bg} relative overflow-hidden`}>
+                           <div className="flex justify-between items-start mb-1">
+                              <div className="flex items-center gap-2">
+                                {icon}
+                                <span className="font-semibold text-sm">{rec.title}</span>
+                              </div>
+                              <span className="text-[10px] uppercase font-bold tracking-wider opacity-60 bg-black/20 px-2 py-0.5 rounded">
+                                {rec.category}
+                              </span>
+                           </div>
+                           <p className="text-xs text-gray-400 mb-2">{rec.reasoning}</p>
+                           <div className="text-xs font-mono text-eco-400">Est. Gain: {rec.gain}</div>
+                        </div>
+                      )
+                    })}
+                  </div>
+                </div>
+
+                <div className="flex-1 flex flex-col min-h-[300px] animate-in fade-in slide-in-from-bottom-8">
+                   <div className="flex items-center justify-between mb-3">
+                      <div className="flex items-center gap-2 text-sm font-medium text-eco-400">
+                        <ArrowRight className="w-4 h-4" />
+                        <span>Gemini Auto-Refactored Code (LoRA / QAT Applied)</span>
+                      </div>
+                      
+                      {!feedbackSent && !privacyMode && (
+                        <button 
+                          onClick={handleFeedback}
+                          className="flex items-center gap-1.5 text-xs text-gray-400 hover:text-white transition-colors border border-gray-700 hover:border-eco-500 rounded px-2 py-1 animate-pulse"
+                        >
+                          <Share2 className="w-3 h-3" />
+                          <span>Contribute Anonymized AST</span>
+                        </button>
+                      )}
+                      
+                      {privacyMode && (
+                        <span className="text-xs text-gray-600 flex items-center gap-1 cursor-not-allowed" title="Disable Privacy Mode to contribute">
+                           <Lock className="w-3 h-3" />
+                           Data contribution paused
+                        </span>
+                      )}
+
+                      {feedbackSent && (
+                        <span className="text-xs text-eco-500 flex items-center gap-1">
+                          <CheckCircle2 className="w-3 h-3" />
+                          Data Contributed
+                        </span>
+                      )}
+                  </div>
+                  <CodeBlock 
+                    code={result.optimizedCode} 
+                    label="Green AI Implementation" 
+                    color="green"
+                  />
+                </div>
+              </>
+            )}
+          </div>
+        </div>
+      </main>
+
+      <footer className="py-4 border-t border-gray-800 text-center">
+        <div className="flex flex-col items-center gap-2 text-xs text-gray-500">
+          <div className="flex items-center gap-2">
+            <Info className="w-3 h-3" />
+            <p>
+              Analysis uses <span className="text-purple-400">Smart Static Analysis</span> for structure, <span className="text-blue-400">Google Search</span> for specs, and <span className="text-orange-400">Code Execution</span> for math verification.
+            </p>
+          </div>
+          <p className="opacity-60 max-w-2xl px-4">
+             Ethical AI Notice: We practice Privacy by Design. Only structural AST patterns are analyzed.
+          </p>
+        </div>
+      </footer>
+    </div>
+  );
+}
