@@ -2,6 +2,16 @@ import { GoogleGenAI, Type, FunctionDeclaration, Tool, FunctionCallPart, Functio
 import { AnalysisResult, HardwareProfile } from "../types";
 import { analyzeCodeStatic } from "./staticAnalyzer";
 
+// Initialize Gemini Client
+// P0-1: Prioritize GEMINI_API_KEY for consistency, fallback to API_KEY
+// const apiKey = process.env.GEMINI_API_KEY || process.env.API_KEY;
+
+// if (!apiKey) {
+//   console.error("Missing API Key. Please set GEMINI_API_KEY in .env.local");
+// }
+
+// const ai = new GoogleGenAI({ apiKey: apiKey });
+
 // Region Carbon Intensity Map (Duplicated from HardwareSelector to avoid circular deps/React imports)
 const REGION_CARBON_INTENSITY: Record<string, number> = {
   'us-central1': 360,
@@ -72,12 +82,8 @@ async function processImageForGemini(dataUrl: string): Promise<string> {
   });
 }
 
-/**
- * Main Analysis Function
- * NOW SUPPORTS DYNAMIC API KEY FOR MVP (BYOK)
- */
 export const analyzeAndOptimizeStream = async (
-  apiKey: string, // Changed: API Key must be passed in
+  apiKey: string,
   code: string,
   hardware: HardwareProfile,
   onChunk: (text: string) => void,
@@ -87,10 +93,9 @@ export const analyzeAndOptimizeStream = async (
 ): Promise<AnalysisResult> => {
 
   if (!apiKey) {
-    throw new GeminiError("API Key is missing. Please configure your settings.", false);
+      throw new GeminiError("No API Key provided. Please set your Gemini API Key in Settings.", false);
   }
 
-  // Initialize Client Scope-Locally
   const ai = new GoogleGenAI({ apiKey: apiKey });
 
   // Step 1: Run Static Analysis (Enhanced P1-1)
@@ -142,9 +147,8 @@ export const analyzeAndOptimizeStream = async (
     - **Estimated Compute**: ${estimatedGFlops} GFLOPs (theoretical - use as baseline)
 
     ## MANDATORY TOOL USE & FALLBACKS
-    1. **GOOGLE SEARCH**: 
-       - Find **2026 hardware specifications** for '${hardware.name}'. Look for TDP and Joules/Op.
-       - **FINOPS CHECK**: Search for "On-demand price per hour for ${hardware.name} on AWS/GCP/Azure".
+    1. **GOOGLE SEARCH**: Find **2026 hardware specifications** for '${hardware.name}'.
+       - Search for "TDP", "Joules/Op", or "System Overheads".
        - **MLPerf Validation**: Search for "MLPerf Inference v4.0" or "v5.0" results for this hardware class.
     
     2. **CODE EXECUTION (Calculus)**: 
@@ -162,12 +166,6 @@ export const analyzeAndOptimizeStream = async (
 
     ## CRITICAL BUG DETECTION
     If the user's code implies a specific architecture (like ResNet, Transformer) but is **missing key components** (e.g., missing residual connection 'x + out', missing LayerNorm, missing activation), you MUST start the 'bottleneckAnalysis' field with the exact text: "CRITICAL BUG:".
-
-    ## FINOPS (COST) ESTIMATION
-    You must estimate the monetary savings.
-    1. Find hourly cost of the hardware.
-    2. Estimate runtime for 1 Million Inferences based on FLOPs/throughput.
-    3. Calculate 'costSavingsPer1MInference' = (Original_Time - Optimized_Time) * Hourly_Rate.
 
     ## OUTPUT SCHEMA
     Return JSON strictly matching the schema.
@@ -228,11 +226,6 @@ export const analyzeAndOptimizeStream = async (
               optimizedEnergyJoules: { type: Type.NUMBER },
               improvementPercentage: { type: Type.NUMBER },
               carbonSavedGrams: { type: Type.NUMBER },
-              
-              // NEW FINOPS FIELDS
-              estimatedHourlyCost: { type: Type.NUMBER, description: "Hourly cost of the hardware in USD" },
-              costSavingsPer1MInference: { type: Type.NUMBER, description: "Estimated USD saved per 1 million inferences" },
-
               confidenceScore: { type: Type.NUMBER },
               uncertaintyFactors: { type: Type.ARRAY, items: { type: Type.STRING } },
               

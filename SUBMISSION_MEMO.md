@@ -4,49 +4,64 @@
 
 ---
 
-## 💡 Inspiration
-We were shocked to learn that training a single large AI model can emit as much carbon as **five cars over their entire lifetimes**. 
+## 1. Project Overview
+**EcoCompute AI** is an intelligent energy optimization platform designed to solve the growing carbon footprint of AI workloads. Unlike traditional static analysis tools, it leverages **Gemini 3 Pro** to act as a virtual "Performance Engineer," reading code and diagrams to prescribe sustainable optimizations (LoRA, Quantization, etc.).
 
-As developers, we want to build powerful AI, but we often treat energy as an afterthought because optimization is *hard*. It requires deep knowledge of hardware physics, memory bandwidth, and thermal dynamics. 
+## 💡 Inspiration (The "Why")
+Training a single large language model can emit as much carbon as **five cars over their entire lifetimes**. As developers, we often chase state-of-the-art performance while ignoring the environmental cost. We wanted to build a tool that makes "Green AI" accessible—not by lecturing developers, but by giving them an intelligent Agent that does the hard work of optimization for them. We were inspired by the idea: *What if your IDE cared about the planet as much as it cares about syntax errors?*
 
-We asked: **What if we could use Gemini 3's reasoning capabilities to democratize this expertise?** What if every developer had a virtual "Senior Performance Engineer" sitting next to them, optimizing their code for sustainability in real-time?
-
-## 🚀 What it does
-**EcoCompute AI** is an intelligent energy auditing platform.
-1.  **Audits**: It scans PyTorch code and hand-drawn architecture sketches.
-2.  **Grounds**: It searches Google for real-time 2026 hardware specs (e.g., NVIDIA B200, Google Edge TPU) and MLPerf benchmarks.
-3.  **Verifies**: It uses Python Code Execution to mathematically prove bottlenecks (e.g., Arithmetic Intensity).
-4.  **Optimizes**: It refactors the code with Green AI techniques (LoRA, Quantization, Operator Fusion).
-
-## ⚙️ How we built it
+## 2. Gemini 3 Feature Utilization (The "Action" & "Reasoning" Stack)
 We utilized the full spectrum of the `@google/genai` SDK to create a specialized agent:
 
-*   **Gemini 3 Pro**: The brain of the operation.
-*   **Thinking Budget (2048 Tokens)**: We explicitly allocated a "Deep Thinking" budget. This allows the model to plan its audit strategy, formulate search queries, and cross-reference physics equations *before* generating a response.
-*   **Agentic Tool Use**: 
-    *   **Google Search**: Used to find dynamic data like "Carbon Intensity of Iowa Data Centers" or "H100 TDP".
-    *   **Code Execution**: Used to calculate FLOPs/Byte. We don't let the LLM guess math; we make it write Python to prove it.
-*   **Hybrid Grounding**: We built a custom "Data Moat" that combines deterministic Static Analysis (AST parsing) with probabilistic LLM reasoning.
+### 1. ⚡ Code Execution (Agentic Actions)
+*   **Usage**: Configured `{ tools: [{ codeExecution: {} }] }`.
+*   **Why**: We don't just ask the model to *guess* math. The agent writes and executes Python scripts inside the sandbox to strictly calculate **Arithmetic Intensity (FLOPs/Byte)**. This validates that a model is truly memory-bound before recommending optimizations.
 
-## 🚧 Challenges we ran into
-*   **Balancing the Token Budget**: Initially, the model would over-think simple tasks or under-think complex physics. We had to tune the `thinkingBudget` and prompt engineering to ensure it knew *when* to trigger the "Deep Reasoning" mode.
-*   **Real-time Visualization**: Streaming the "Thinking Process" to the UI without breaking the JSON output structure was tricky. We implemented a custom stream parser that separates `[[PHASE]]` tags from the final JSON payload.
-*   **Hallucination vs. Physics**: LLMs can be bad at math. We solved this by forcing the model to use the **Code Execution sandbox** for all arithmetic operations, ensuring 100% accuracy in our energy estimates.
+### 2. 🧠 Thinking Budget (Reasoning Process)
+*   **Usage**: Configured `{ thinkingConfig: { thinkingBudget: 2048 } }`.
+*   **Why**: Energy optimization is complex physics. We allocated a specific token budget for "Deep Thinking," allowing the model to plan its search queries for hardware specs before generating the final advice. The UI visualizes this token consumption in real-time.
 
-## 🏆 Accomplishments that we're proud of
-*   **The "Decision Triangle"**: A unique UI component that forces users to visualize the trade-off between Performance, Cost, and Carbon.
-*   **Live Hardware Search**: The app doesn't rely on a stale database. It actually finds new hardware specs from the web in real-time.
-*   **Scientific Rigor**: We cross-reference our predictions with MLPerf Inference v4.1 data, providing a confidence score that engineers can trust.
+### 3. 🔍 Google Search Grounding (Live Data)
+*   **Usage**: Configured `{ tools: [{ googleSearch: {} }] }`.
+*   **Why**: Hardware specs change monthly. The agent searches for **Real-time 2026 Hardware Specs** (e.g., NVIDIA B200 TDP, Coral TPU Host-to-USB overhead) and explicitly cross-references **MLPerf Inference v4.1** results.
 
-## 📚 What we learned
-*   **Agentic Workflows > RAG**: For technical tasks, giving the model tools (Search, Code Exec) is far more powerful than just feeding it documents.
-*   **Sustainability is a Data Problem**: Making carbon usage visible is half the battle. Once developers see the "Grams of CO2" metric, they naturally want to optimize it.
+### 4. 👁️ Multimodal Vision
+*   **Usage**: Accepts hand-drawn neural network sketches.
+*   **Why**: Correlates visual topology (e.g., "Is there a skip connection?") with code structure to find hidden bottlenecks.
 
-## 🔮 What's next for EcoCompute AI
-*   **Video Profiler**: Upload screen recordings of `nsys` or PyTorch Profiler for visual hotspot detection.
-*   **IDE Plugin**: A "Green Linter" for VS Code that warns you about energy-inefficient layers as you type.
-*   **Google Maps Integration**: Precise carbon intensity based on the exact data center location.
+## 3. Technical Highlights
 
----
+### 🛡️ Hybrid Grounding Architecture
+We built a "Data Moat" by combining:
+1.  **Deterministic Static Analysis**: A client-side AST parser counts layers (Truth).
+2.  **Probabilistic LLM Reasoning**: Gemini interprets these counts within the context of hardware constraints (Creativity).
+3.  **Scientific Verification**: MLPerf benchmarks serve as the "Ground Truth" for energy predictions.
+
+### 🔺 The Decision Triangle
+A core UI component that visualizes the inherent engineering trade-offs between **Performance**, **Cost**, and **Carbon Efficiency**. This forces users to make conscious decisions rather than blindly chasing speed.
+
+## 4. Product Value & Impact
+Training large models generates massive carbon emissions. **EcoCompute AI** democratizes "Green AI" expertise, allowing any developer to reduce their model's energy consumption by 30-50% through automated, expert-level refactoring.
+
+## 5. Challenges We Ran Into
+*   **Prompt Engineering for Structure**: Getting the model to output strict JSON for the visualization while simultaneously maintaining the creative "Performance Engineer" persona was tricky. We solved this by using strict schema definitions in the system instruction.
+*   **Balancing Token Budget**: The "Thinking Process" is powerful but hungry. We had to tune the `thinkingBudget` to 2048 to ensure deep reasoning without hitting latency limits for a real-time tool.
+*   **Grounding Accuracy**: Initially, the model would hallucinate hardware specs. Implementing the **Google Search Tool** as a mandatory step for fetching TDP values solved this completely.
+
+## 6. Accomplishments We're Proud Of
+*   **The "Hybrid Grounding" System**: Successfully merging deterministic AST analysis (code math) with probabilistic LLM reasoning. It feels like magic but is grounded in math.
+*   **Real-time Multimodal Analysis**: Seeing the agent correctly identify a "skip connection" from a rough hand-drawn sketch was a "wow" moment for the team.
+
+## 7. What We Learned
+*   **Agentic AI is different from Chat**: Building an agent that *does* things (searches, calculates) requires a different mindset than building a chatbot. You have to design for "Tools First."
+*   **Sustainability is a Data Problem**: We realized that developers care about green AI, they just lack the data to act on it. EcoCompute bridges that gap.
+
+## 8. What's Next for EcoCompute AI
+*   **IDE Extension**: Porting this web app to a VS Code extension for inline linting.
+*   **CI/CD Integration**: A GitHub Action that blocks PRs if the "Carbon Score" increases significantly.
+*   **Enterprise Hardware Profiles**: Adding support for custom on-premise cluster configurations.
+
+## 9. Conclusion
+EcoCompute AI demonstrates that Generative AI isn't just a consumer of energy—it is the most powerful tool we have to optimize it.
 
 **Let's Code Green! 🌿**

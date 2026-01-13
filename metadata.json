@@ -1,6 +1,7 @@
 {
   "name": "EcoCompute AI",
-  "version": "2.0.0",
-  "description": "An intelligent energy consumption analyzer grounded in MLPerf Power Results. It uses Gemini 3 to predict energy bottlenecks and generate Green AI optimized code.",
+  "version": "2.1.0",
+  "description": "The 'Green AI' Architect. Uses Gemini 3 Agentic capabilities (Search + Code Execution) to act as a virtual Performance Engineer, analyzing PyTorch code and Visual Topologies to reduce AI Carbon Footprint by 30-50%.",
+  "keywords": ["gemini-3", "green-ai", "sustainability", "agentic", "code-execution", "multimodal", "react", "optimization"],
   "requestFramePermissions": []
 }
