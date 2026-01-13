@@ -1,0 +1,6 @@
+{
+  "name": "EcoCompute AI",
+  "version": "2.0.0",
+  "description": "An intelligent energy consumption analyzer grounded in MLPerf Power Results. It uses Gemini 3 to predict energy bottlenecks and generate Green AI optimized code.",
+  "requestFramePermissions": []
+}
