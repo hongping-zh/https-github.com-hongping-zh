@@ -4,13 +4,13 @@ import { analyzeCodeStatic } from "./staticAnalyzer";
 
 // Initialize Gemini Client
 // P0-1: Prioritize GEMINI_API_KEY for consistency, fallback to API_KEY
-const apiKey = process.env.GEMINI_API_KEY || process.env.API_KEY;
+// const apiKey = process.env.GEMINI_API_KEY || process.env.API_KEY;
 
-if (!apiKey) {
-  console.error("Missing API Key. Please set GEMINI_API_KEY in .env.local");
-}
+// if (!apiKey) {
+//   console.error("Missing API Key. Please set GEMINI_API_KEY in .env.local");
+// }
 
-const ai = new GoogleGenAI({ apiKey: apiKey });
+// const ai = new GoogleGenAI({ apiKey: apiKey });
 
 // Region Carbon Intensity Map (Duplicated from HardwareSelector to avoid circular deps/React imports)
 const REGION_CARBON_INTENSITY: Record<string, number> = {
@@ -83,6 +83,7 @@ async function processImageForGemini(dataUrl: string): Promise<string> {
 }
 
 export const analyzeAndOptimizeStream = async (
+  apiKey: string,
   code: string,
   hardware: HardwareProfile,
   onChunk: (text: string) => void,
@@ -90,6 +91,12 @@ export const analyzeAndOptimizeStream = async (
   scope: 'snippet' | 'module' = 'snippet',
   onPhaseChange?: (phase: string) => void
 ): Promise<AnalysisResult> => {
+
+  if (!apiKey) {
+      throw new GeminiError("No API Key provided. Please set your Gemini API Key in Settings.", false);
+  }
+
+  const ai = new GoogleGenAI({ apiKey: apiKey });
 
   // Step 1: Run Static Analysis (Enhanced P1-1)
   const staticData = analyzeCodeStatic(code);

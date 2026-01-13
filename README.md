@@ -173,6 +173,8 @@ const result = await model.generateContentStream({
 
 ## 🌟 What's New in v18
 
+- ✅ **Client-Side Architecture**: Zero-server deployment with BYOK privacy
+- ✅ **Export Reports**: Generate shareable Markdown audit reports
 - ✅ **Code Execution**: Python sandbox for verified calculations
 - ✅ **Thinking Budget**: 2048 tokens for deep reasoning
 - ✅ **Region Carbon Intensity**: Location-aware emissions
