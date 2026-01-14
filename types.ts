@@ -45,6 +45,9 @@ export interface AnalysisResult {
   improvementPercentage: number;
   carbonSavedGrams: number;
   
+  estimatedHourlyCost?: number;
+  costSavingsPer1MInference?: number;
+  
   // Uncertainty Quantification
   confidenceScore: number; // 0.0 to 1.0
   uncertaintyFactors: string[]; // List of factors lowering confidence

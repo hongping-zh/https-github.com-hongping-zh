@@ -74,6 +74,10 @@ export default function App() {
 - **Energy Reduction:** ${result.improvementPercentage}%
 - **Carbon Saved:** ${result.carbonSavedGrams.toExponential(2)} g CO2e
 
+## 💰 Cloud FinOps
+- **Estimated Hourly Rate:** ${result.estimatedHourlyCost != null ? `$${result.estimatedHourlyCost}` : 'N/A'}
+- **Projected Savings (per 1M inferences):** ${result.costSavingsPer1MInference != null ? `$${result.costSavingsPer1MInference}` : 'N/A'}
+
 ## 🧐 Bottleneck Analysis
 ${result.bottleneckAnalysis}
 

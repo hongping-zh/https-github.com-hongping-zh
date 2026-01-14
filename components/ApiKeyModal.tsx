@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Key, Lock, ExternalLink, CheckCircle2, AlertCircle } from 'lucide-react';
+import { Key, Lock, ExternalLink, CheckCircle2, AlertCircle, AlertTriangle } from 'lucide-react';
 
 interface ApiKeyModalProps {
   isOpen: boolean;
@@ -61,6 +61,14 @@ export const ApiKeyModal: React.FC<ApiKeyModalProps> = ({ isOpen, onSave, onClos
                <strong className="block mb-1 text-blue-100">Zero-Server Privacy</strong>
                Your API key is stored locally in your browser's <code className="bg-black/30 px-1 py-0.5 rounded">localStorage</code>. 
                It is never sent to our servers. We communicate directly with Google's API from your client.
+             </div>
+          </div>
+
+          <div className="bg-orange-500/10 border border-orange-500/20 rounded-xl p-4 flex gap-3">
+             <AlertTriangle className="w-5 h-5 text-orange-400 shrink-0 mt-0.5" />
+             <div className="text-xs text-orange-200">
+               <strong className="block mb-1 text-orange-100">Quota Note (Free Tier)</strong>
+               Free API keys can hit strict rate limits (429 / RESOURCE_EXHAUSTED). If that happens, wait a moment, retry, or use a paid key.
              </div>
           </div>
 

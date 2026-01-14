@@ -1,4 +1,4 @@
-import { GoogleGenAI, Type, FunctionDeclaration, Tool, FunctionCallPart, FunctionResponsePart } from "@google/genai";
+import { GoogleGenAI, Type, Tool } from "@google/genai";
 import { AnalysisResult, HardwareProfile } from "../types";
 import { analyzeCodeStatic } from "./staticAnalyzer";
 
@@ -30,11 +30,19 @@ export class GeminiError extends Error {
 }
 
 // Retry Logic Helper
-async function retryOperation<T>(operation: () => Promise<T>, retries = 2, delay = 1000): Promise<T> {
+async function retryOperation<T>(operation: () => Promise<T>, retries = 1, delay = 2000): Promise<T> {
   try {
     return await operation();
   } catch (error: any) {
-    if (retries > 0 && (error.status === 503 || error.status === 429 || error.message.includes("fetch"))) {
+    const errorString = JSON.stringify(error);
+    const isRateLimit =
+      error.status === 429 ||
+      error.code === 429 ||
+      errorString.includes("429") ||
+      errorString.includes("quota") ||
+      errorString.includes("RESOURCE_EXHAUSTED");
+
+    if (retries > 0 && (error.status === 503 || isRateLimit || error.message?.includes("fetch"))) {
       await new Promise(res => setTimeout(res, delay));
       return retryOperation(operation, retries - 1, delay * 2);
     }
@@ -147,8 +155,9 @@ export const analyzeAndOptimizeStream = async (
     - **Estimated Compute**: ${estimatedGFlops} GFLOPs (theoretical - use as baseline)
 
     ## MANDATORY TOOL USE & FALLBACKS
-    1. **GOOGLE SEARCH**: Find **2026 hardware specifications** for '${hardware.name}'.
-       - Search for "TDP", "Joules/Op", or "System Overheads".
+    1. **GOOGLE SEARCH**: 
+       - Find **2026 hardware specifications** for '${hardware.name}'. Look for TDP and Joules/Op.
+       - **FINOPS CHECK**: Search for "On-demand price per hour for ${hardware.name} on AWS/GCP/Azure".
        - **MLPerf Validation**: Search for "MLPerf Inference v4.0" or "v5.0" results for this hardware class.
     
     2. **CODE EXECUTION (Calculus)**: 
@@ -208,7 +217,7 @@ export const analyzeAndOptimizeStream = async (
           systemInstruction,
           tools: tools,
           thinkingConfig: { 
-            thinkingBudget: 2048 // Explicit budget as requested
+            thinkingBudget: 1024 // Explicit budget as requested
           },
           responseMimeType: "application/json",
           responseSchema: {
@@ -226,6 +235,8 @@ export const analyzeAndOptimizeStream = async (
               optimizedEnergyJoules: { type: Type.NUMBER },
               improvementPercentage: { type: Type.NUMBER },
               carbonSavedGrams: { type: Type.NUMBER },
+              estimatedHourlyCost: { type: Type.NUMBER },
+              costSavingsPer1MInference: { type: Type.NUMBER },
               confidenceScore: { type: Type.NUMBER },
               uncertaintyFactors: { type: Type.ARRAY, items: { type: Type.STRING } },
               
@@ -383,8 +394,35 @@ export const analyzeAndOptimizeStream = async (
 
     } catch (error: any) {
       console.error("Gemini Failure:", error);
+
+      let errorMsg = error?.message || "Unknown API Error";
+      let status = error?.status || error?.code;
+
+      try {
+        if (typeof errorMsg === 'string' && errorMsg.trim().startsWith('{')) {
+          const parsed = JSON.parse(errorMsg);
+          if (parsed?.error) {
+            errorMsg = parsed.error.message || errorMsg;
+            status = parsed.error.code || status;
+          }
+        }
+      } catch (e) {
+      }
+
+      if (
+        status === 429 ||
+        errorMsg.includes("429") ||
+        errorMsg.includes("quota") ||
+        errorMsg.includes("RESOURCE_EXHAUSTED")
+      ) {
+        throw new GeminiError(
+          "Gemini Quota Exceeded (429). Please wait a moment, check your plan, or use a paid API Key.",
+          true
+        );
+      }
+
       if (error instanceof GeminiError) throw error;
-      throw new GeminiError(error.message || "Unknown API Error", true);
+      throw new GeminiError(errorMsg, true);
     }
   });
 };
