@@ -130,6 +130,24 @@ ${result.citations?.map(c => `  - ${c}`).join('\n') || '  - MLPerf Inference v4.
     setToast({ message, type });
   };
 
+  const isQuotaError = (err: any) => {
+    if (!err) return false;
+    const status = err.status ?? err.code;
+    if (status === 429) return true;
+    const errorString = (() => {
+      try {
+        return JSON.stringify(err);
+      } catch {
+        return String(err);
+      }
+    })();
+    return (
+      errorString.includes('429') ||
+      errorString.toLowerCase().includes('quota') ||
+      errorString.includes('RESOURCE_EXHAUSTED')
+    );
+  };
+
   const handleViewSample = () => {
     setIsAnalyzing(true);
     setResult(null);
@@ -219,8 +237,17 @@ ${result.citations?.map(c => `  - ${c}`).join('\n') || '  - MLPerf Inference v4.
       console.error(error);
       // P0-1: Log error to Moat Service to ensure visualization doesn't freeze
       moatService.logError();
-      const msg = error instanceof GeminiError ? error.message : "Connection failed. Check GEMINI_API_KEY.";
+      const quotaExceeded = isQuotaError(error);
+      const msg = quotaExceeded
+        ? "Gemini Quota Exceeded (429). Open the API Key modal and click 'Try Demo (No Key)' to continue."
+        : (error instanceof GeminiError ? error.message : "Connection failed. Check GEMINI_API_KEY.");
       showToast(msg, "error");
+      if (quotaExceeded) {
+        setStreamContent((prev) =>
+          prev + "\n[Quota Exceeded] You can switch API keys or use Read-Only Demo Mode (no key).\n"
+        );
+        setShowKeyModal(true);
+      }
     } finally {
       setIsAnalyzing(false);
       setActivePhase(''); // Reset phase
