@@ -1,6 +1,5 @@
 {
-  "build": {
-    "command": "npm run build",
-    "output": "dist"
-  }
+  "buildCommand": "npm run build",
+  "installCommand": "npm ci",
+  "outputDirectory": "dist"
 }
