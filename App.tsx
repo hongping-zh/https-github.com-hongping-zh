@@ -134,11 +134,13 @@ ${result.citations?.map(c => `  - ${c}`).join('\n') || '  - MLPerf Inference v4.
     if (!err) return false;
     const status = err.status ?? err.code;
     if (status === 429) return true;
+    const message = typeof err?.message === 'string' ? err.message : '';
     const errorString = (() => {
       try {
-        return JSON.stringify(err);
+        const json = JSON.stringify(err);
+        return `${message} ${json}`;
       } catch {
-        return String(err);
+        return `${message} ${String(err)}`;
       }
     })();
     return (
