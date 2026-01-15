@@ -1,0 +1,14 @@
+version: '3.8'
+
+services:
+  ecocompute:
+    build: .
+    ports:
+      - "3000:80"
+    restart: always
+    container_name: ecocompute-audit
+    environment:
+      - NODE_ENV=production
+    # Optional: If we later add backend features requiring keys
+    # env_file:
+    #   - .env.local

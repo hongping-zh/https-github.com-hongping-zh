@@ -305,6 +305,7 @@ ${result.citations?.map(c => `  - ${c}`).join('\n') || '  - MLPerf Inference v4.
       {toast && <Toast message={toast.message} type={toast.type} onClose={() => setToast(null)} />}
 
       {/* Header */}
+      {!isEmbedMode && (
       <header className="border-b border-gray-800 bg-dark-900/50 backdrop-blur-md sticky top-0 z-50">
         <div className="max-w-7xl mx-auto px-6 h-16 flex items-center justify-between">
           <div className="flex items-center gap-3">
@@ -366,6 +367,7 @@ ${result.citations?.map(c => `  - ${c}`).join('\n') || '  - MLPerf Inference v4.
           </div>
         </div>
       </header>
+      )}
 
       <main className="max-w-7xl mx-auto px-6 py-8 flex-1 w-full">
         <div className="mb-6 flex justify-end">
