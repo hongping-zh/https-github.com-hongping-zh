@@ -30,7 +30,7 @@ export const ThinkingPanel: React.FC<Props> = ({ streamContent, activePhase, isS
         return { text: "Synthesizing Green Strategy...", icon: Cpu, color: "text-white" };
       default:
         // Default initial state
-        return { text: "Allocating Thinking Budget (2048 Tokens)...", icon: BrainCircuit, color: "text-purple-400" };
+        return { text: "Allocating Thinking Budget (1024 Tokens)...", icon: BrainCircuit, color: "text-purple-400" };
     }
   };
 
@@ -38,7 +38,7 @@ export const ThinkingPanel: React.FC<Props> = ({ streamContent, activePhase, isS
   const StepIcon = currentStep.icon;
   
   // Visualize Thinking Budget Consumption
-  const budget = 2048;
+  const budget = 1024;
   const simulatedUsed = Math.min(budget, Math.floor(streamContent.length * 0.6)); 
   const progress = (simulatedUsed / budget) * 100;
 

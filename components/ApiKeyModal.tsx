@@ -1,14 +1,15 @@
 import React, { useState, useEffect } from 'react';
-import { Key, Lock, ExternalLink, CheckCircle2, AlertCircle, AlertTriangle } from 'lucide-react';
+import { Key, Lock, ExternalLink, CheckCircle2, AlertCircle, AlertTriangle, PlayCircle } from 'lucide-react';
 
 interface ApiKeyModalProps {
   isOpen: boolean;
   onSave: (key: string) => void;
   onClose: () => void;
+  onViewSample: () => void;
   hasKey: boolean;
 }
 
-export const ApiKeyModal: React.FC<ApiKeyModalProps> = ({ isOpen, onSave, onClose, hasKey }) => {
+export const ApiKeyModal: React.FC<ApiKeyModalProps> = ({ isOpen, onSave, onClose, onViewSample, hasKey }) => {
   const [key, setKey] = useState('');
   const [error, setError] = useState('');
   
@@ -33,6 +34,11 @@ export const ApiKeyModal: React.FC<ApiKeyModalProps> = ({ isOpen, onSave, onClos
       return;
     }
     onSave(key.trim());
+  };
+
+  const handleDemoMode = () => {
+    onViewSample();
+    onClose();
   };
 
   return (
@@ -104,6 +110,27 @@ export const ApiKeyModal: React.FC<ApiKeyModalProps> = ({ isOpen, onSave, onClos
               Save & Connect
             </button>
           </form>
+
+          <div className="flex gap-3">
+            <button
+              type="button"
+              onClick={handleDemoMode}
+              className="flex-1 flex items-center justify-center gap-2 px-4 py-2 rounded-xl border border-purple-500/30 text-purple-300 hover:bg-purple-500/10 transition-colors text-xs font-medium"
+            >
+              <PlayCircle className="w-3 h-3" />
+              Try Demo (No Key)
+            </button>
+
+            {hasKey && (
+              <button
+                type="button"
+                onClick={onClose}
+                className="px-4 py-2 rounded-xl border border-gray-700 text-gray-400 hover:text-white hover:bg-gray-800 transition-colors text-xs font-medium"
+              >
+                Cancel
+              </button>
+            )}
+          </div>
 
           <div className="pt-4 border-t border-gray-800 text-center">
              <a 

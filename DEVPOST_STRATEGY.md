@@ -32,7 +32,7 @@ Since the video is simple, overload the image gallery with annotated screenshots
 Devpost often asks for a code snippet. Use the configuration block I added to the `README.md` (under "Gemini 3 Agentic Features"). It shows you are using the *newest* features:
 *   `googleSearch: {}`
 *   `codeExecution: {}`
-*   `thinkingBudget: 2048`
+*   `thinkingBudget: 1024`
 
 ## 6. 🚀 Final Polish
 *   **Tagging**: Ensure you used tags like `Gemini 3`, `Sustainability`, `Agent`, `React`.

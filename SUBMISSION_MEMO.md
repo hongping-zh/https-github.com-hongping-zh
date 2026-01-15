@@ -18,8 +18,8 @@ We utilized the full spectrum of the `@google/genai` SDK to create a specialized
 *   **Why**: We don't just ask the model to *guess* math. The agent writes and executes Python scripts inside the sandbox to strictly calculate **Arithmetic Intensity (FLOPs/Byte)**. This validates that a model is truly memory-bound before recommending optimizations.
 
 ### 2. 🧠 Thinking Budget (Reasoning Process)
-*   **Usage**: Configured `{ thinkingConfig: { thinkingBudget: 2048 } }`.
-*   **Why**: Energy optimization is complex physics. We allocated a specific token budget for "Deep Thinking," allowing the model to plan its search queries for hardware specs before generating the final advice. The UI visualizes this token consumption in real-time.
+*   **Usage**: Configured `{ thinkingConfig: { thinkingBudget: 1024 } }`.
+*   **Why**: Energy optimization is complex physics. We allocated a token budget for "Deep Thinking" tuned to reduce quota/rate-limit failures while still enabling deep reasoning. This allows the model to plan its search queries for hardware specs before generating the final advice. The UI visualizes this token consumption in real-time.
 
 ### 3. 🔍 Google Search Grounding (Live Data)
 *   **Usage**: Configured `{ tools: [{ googleSearch: {} }] }`.
@@ -45,7 +45,7 @@ Training large models generates massive carbon emissions. **EcoCompute AI** demo
 
 ## 5. Challenges We Ran Into
 *   **Prompt Engineering for Structure**: Getting the model to output strict JSON for the visualization while simultaneously maintaining the creative "Performance Engineer" persona was tricky. We solved this by using strict schema definitions in the system instruction.
-*   **Balancing Token Budget**: The "Thinking Process" is powerful but hungry. We had to tune the `thinkingBudget` to 2048 to ensure deep reasoning without hitting latency limits for a real-time tool.
+*   **Balancing Token Budget**: The "Thinking Process" is powerful but hungry. We tuned the `thinkingBudget` to 1024 to reduce quota/rate-limit failures while still preserving deep reasoning for physics-heavy audits.
 *   **Grounding Accuracy**: Initially, the model would hallucinate hardware specs. Implementing the **Google Search Tool** as a mandatory step for fetching TDP values solved this completely.
 
 ## 6. Accomplishments We're Proud Of

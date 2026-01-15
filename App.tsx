@@ -11,6 +11,7 @@ import { ApiKeyModal } from './components/ApiKeyModal';
 import { Toast, ToastType } from './components/Toast';
 import { analyzeAndOptimizeStream, GeminiError } from './services/geminiService';
 import { moatService } from './services/moatService';
+import { MOCK_ANALYSIS_RESULT } from './services/mockData';
 import { HardwareProfile, AnalysisResult, INITIAL_CODE, EXAMPLES, DEMO_SKETCH } from './types';
 import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip, Legend } from 'recharts';
 import { Leaf, Cpu, Zap, ArrowRight, Activity, Info, Database, Lightbulb, AlertTriangle, CheckCircle2, HelpCircle, ShieldCheck, Share2, Lock, EyeOff, BookOpen, ChevronDown, BrainCircuit, Search, Server, FileText, Bug, Key, Download } from 'lucide-react';
@@ -129,6 +130,48 @@ ${result.citations?.map(c => `  - ${c}`).join('\n') || '  - MLPerf Inference v4.
     setToast({ message, type });
   };
 
+  const handleViewSample = () => {
+    setIsAnalyzing(true);
+    setResult(null);
+    setStreamContent('Initializing Read-Only Demo Mode...\n');
+    setActivePhase('SEARCH');
+    setSandboxUsed(false);
+    setFeedbackSent(false);
+    setShowMoat(false);
+    setShowAssumptions(false);
+
+    setTimeout(() => {
+      setStreamContent((prev) => prev + "> [System] Mocking Google Search for 'NVIDIA A100' specs...\n");
+    }, 250);
+
+    setTimeout(() => {
+      setActivePhase('COMPUTE');
+      setSandboxUsed(true);
+      setStreamContent((prev) => prev + "> [System] Running Python verified calculation for Arithmetic Intensity...\n> [Sandbox] Executing kernel_math.py...\n");
+    }, 650);
+
+    setTimeout(() => {
+      setActivePhase('STRATEGY');
+      setStreamContent((prev) => prev + "> [System] Synthesizing Green AI recommendations based on bottleneck analysis...\n");
+    }, 1100);
+
+    setTimeout(() => {
+      setResult(MOCK_ANALYSIS_RESULT);
+      const layers = MOCK_ANALYSIS_RESULT.breakdown.length;
+      const opts = MOCK_ANALYSIS_RESULT.recommendations.length;
+      moatService.logAnalysis(layers, opts);
+
+      if (MOCK_ANALYSIS_RESULT.carbonSavedGrams > 0) {
+        const event = new CustomEvent('impact-update', { detail: MOCK_ANALYSIS_RESULT.carbonSavedGrams });
+        window.dispatchEvent(event);
+      }
+
+      showToast('Loaded Read-Only Demo Result', 'success');
+      setIsAnalyzing(false);
+      setActivePhase('');
+    }, 1600);
+  };
+
   const handleAnalyze = async () => {
     setIsAnalyzing(true);
     setResult(null);
@@ -218,6 +261,7 @@ ${result.citations?.map(c => `  - ${c}`).join('\n') || '  - MLPerf Inference v4.
         isOpen={showKeyModal} 
         onSave={handleSaveKey} 
         onClose={() => setShowKeyModal(false)} 
+        onViewSample={handleViewSample}
         hasKey={!!apiKey}
       />
 
