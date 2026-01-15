@@ -193,6 +193,7 @@ ${result.citations?.map(c => `  - ${c}`).join('\n') || '  - MLPerf Inference v4.
   };
 
   const handleAnalyze = async () => {
+    let fallbackToDemo = false;
     setIsAnalyzing(true);
     setResult(null);
     setStreamContent(''); 
@@ -241,18 +242,24 @@ ${result.citations?.map(c => `  - ${c}`).join('\n') || '  - MLPerf Inference v4.
       moatService.logError();
       const quotaExceeded = isQuotaError(error);
       const msg = quotaExceeded
-        ? "Gemini Quota Exceeded (429). Open the API Key modal and click 'Try Demo (No Key)' to continue."
+        ? "Gemini Quota Exceeded (429). Loading Read-Only Demo (no key required)."
         : (error instanceof GeminiError ? error.message : "Connection failed. Check GEMINI_API_KEY.");
-      showToast(msg, "error");
+      showToast(msg, quotaExceeded ? "info" : "error");
       if (quotaExceeded) {
+        fallbackToDemo = true;
         setStreamContent((prev) =>
-          prev + "\n[Quota Exceeded] You can switch API keys or use Read-Only Demo Mode (no key).\n"
+          prev + "\n[Quota Exceeded] Auto-loading Read-Only Demo Mode.\n"
         );
         setShowKeyModal(true);
+        setTimeout(() => {
+          handleViewSample();
+        }, 0);
       }
     } finally {
-      setIsAnalyzing(false);
-      setActivePhase(''); // Reset phase
+      if (!fallbackToDemo) {
+        setIsAnalyzing(false);
+        setActivePhase(''); // Reset phase
+      }
     }
   };
 
