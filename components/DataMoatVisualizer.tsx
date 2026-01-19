@@ -1,6 +1,7 @@
+
 import React, { useState, useEffect } from 'react';
 import { moatService } from '../services/moatService';
-import { Shield, ChevronRight, Database, Activity, Lock } from 'lucide-react';
+import { Shield, ChevronRight, Database, Activity, Lock, Globe } from 'lucide-react';
 
 export const DataMoatVisualizer: React.FC = () => {
   const [activeTab, setActiveTab] = useState<'flywheel' | 'metrics'>('flywheel');
@@ -32,11 +33,11 @@ export const DataMoatVisualizer: React.FC = () => {
 
       <div className="flex items-center gap-3 mb-6 relative z-10">
         <div className="bg-blue-500/10 p-2 rounded-lg border border-blue-500/20">
-          <Database className="w-5 h-5 text-blue-400" />
+          <Globe className="w-5 h-5 text-blue-400" />
         </div>
         <div>
-          <h2 className="text-lg font-bold text-white tracking-tight">DeepGreen Data Moat™</h2>
-          <p className="text-xs text-gray-400">Real-time Telemetry & Grounding Engine</p>
+          <h2 className="text-lg font-bold text-white tracking-tight">Global Efficiency Knowledge Base™</h2>
+          <p className="text-xs text-gray-400">Proprietary Dataset & Network Effect</p>
         </div>
       </div>
 
@@ -46,13 +47,13 @@ export const DataMoatVisualizer: React.FC = () => {
           onClick={() => setActiveTab('flywheel')}
           className={`pb-2 transition-colors ${activeTab === 'flywheel' ? 'text-eco-400 border-b-2 border-eco-500' : 'text-gray-500 hover:text-gray-300'}`}
         >
-          The Flywheel
+          Data Flywheel
         </button>
         <button
           onClick={() => setActiveTab('metrics')}
           className={`pb-2 transition-colors ${activeTab === 'metrics' ? 'text-eco-400 border-b-2 border-eco-500' : 'text-gray-500 hover:text-gray-300'}`}
         >
-          Defensive Barriers
+          Competitive Barriers
         </button>
       </div>
 
@@ -106,15 +107,15 @@ export const DataMoatVisualizer: React.FC = () => {
       <div className="mt-6 pt-4 border-t border-gray-800 flex items-center justify-between text-xs text-gray-500 relative z-10">
         <div className="flex items-center gap-2">
            <Activity className="w-3 h-3 text-eco-500" />
-           <span>Session Layers Scanned: <span className="text-gray-300 transition-all">{layersScanned}</span></span>
+           <span>Data Ingested (Session): <span className="text-gray-300 transition-all">{layersScanned} Layers</span></span>
         </div>
         <div className="flex items-center gap-2">
            <Database className="w-3 h-3 text-blue-500" />
-           <span>Optimizations Identified: <span className="text-gray-300 transition-all">{optsIdentified}</span></span>
+           <span>Dataset Contributed: <span className="text-gray-300 transition-all">{optsIdentified} Records</span></span>
         </div>
         <div className="flex items-center gap-2 opacity-60">
            <Lock className="w-3 h-3" />
-           <span>Session Mode: Local / Ephemeral</span>
+           <span>Privacy: Anonymized</span>
         </div>
       </div>
     </div>

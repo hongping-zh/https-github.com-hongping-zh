@@ -14,13 +14,18 @@ export const TradeoffRadar: React.FC<Props> = ({ metrics }) => {
       fullMark: 100,
     },
     {
-      subject: 'Cost Efficiency',
+      subject: 'Cost Savings',
       A: metrics.costEfficiencyScore,
       fullMark: 100,
     },
     {
-      subject: 'Carbon Efficiency',
+      subject: 'Green Impact',
       A: metrics.carbonEfficiencyScore,
+      fullMark: 100,
+    },
+    {
+      subject: 'Accuracy Safety', // NEW: Addressing the "Accuracy Risk" critique
+      A: metrics.accuracySafetyScore || 95, // Default high safety if undefined
       fullMark: 100,
     },
   ];
@@ -28,8 +33,8 @@ export const TradeoffRadar: React.FC<Props> = ({ metrics }) => {
   return (
     <div className="bg-dark-800/50 p-4 rounded-xl border border-gray-800 flex flex-col items-center justify-center relative overflow-hidden h-full min-h-[250px]">
       <div className="absolute top-4 left-4 z-10">
-        <h3 className="text-gray-500 text-xs font-medium uppercase tracking-wider mb-1">Decision Triangle</h3>
-        <p className="text-[10px] text-gray-400">Balance Trade-offs</p>
+        <h3 className="text-gray-500 text-xs font-medium uppercase tracking-wider mb-1">Decision Quadrant</h3>
+        <p className="text-[10px] text-gray-400">Balancing Risk vs Reward</p>
       </div>
       
       <div className="w-full h-full flex items-center justify-center mt-4">

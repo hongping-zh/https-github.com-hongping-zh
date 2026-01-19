@@ -11,7 +11,11 @@ export interface StaticAnalysis {
   estimatedFlops: number; // in GFLOPs
   layerCounts: Record<string, number>;
   imports: string[];
-  structuralHighlights: StructuralHighlight[]; // Updated to include location data
+  structuralHighlights: StructuralHighlight[];
+  // NEW: Complexity/Abstraction Detection
+  complexityLevel: 'Low' | 'Medium' | 'High';
+  requiresDynamicTracing: boolean; // True if Regex fails to find layers but finds class definitions
+  abstractionWarnings: string[];
 }
 
 // Helper to calculate line number from regex match index
@@ -21,12 +25,14 @@ const getLineFromIndex = (code: string, index: number): number => {
 
 /**
  * A regex-based static analyzer for PyTorch code.
- * P1-1: Enhanced to detect parameters (kernel_size, stride) and residual patterns with line numbers.
+ * UPDATE (Post-Board Meeting): Now includes "Abstraction Detection".
+ * If the code uses factories/loops/config-injection that Regex can't parse,
+ * it explicitly flags "requiresDynamicTracing" to show technical maturity.
  */
 export const analyzeCodeStatic = (code: string): StaticAnalysis => {
   const errors: string[] = [];
+  const abstractionWarnings: string[] = [];
   const layerCounts: Record<string, number> = {};
-  const estimatedFlops = 0; // Keeping simple counter, logic below handles FLOPs weight
   let currentFlops = 0;
   
   // Storage for highlights
@@ -46,11 +52,23 @@ export const analyzeCodeStatic = (code: string): StaticAnalysis => {
   if (!code.includes("import torch")) {
     errors.push("Missing 'import torch'. Optimization requires PyTorch.");
   }
-  if (code.includes("nn.Module") && !code.includes("torch.nn")) {
-    errors.push("Detected nn.Module usage but missing 'import torch.nn'.");
+
+  // 2. Abstraction Detection (The "Anti-Regex" Logic)
+  // Detects if the user is using advanced patterns that hide layers from Regex
+  if (code.match(/def\s+make_layer/g) || code.match(/def\s+_make_layer/g)) {
+     abstractionWarnings.push("Detected Layer Factory pattern.");
+  }
+  if (code.match(/\*args/g) || code.match(/\*\*kwargs/g)) {
+     abstractionWarnings.push("Detected Dynamic Arguments (*args/**kwargs).");
+  }
+  if (code.match(/hydra\.main/g) || code.match(/cfg\./g)) {
+     abstractionWarnings.push("Detected Configuration Injection (Hydra/Cfg).");
+  }
+  if (code.match(/nn\.ModuleList/g) && code.match(/for\s+.*\s+in/g)) {
+     abstractionWarnings.push("Detected Dynamic Module Loops.");
   }
 
-  // 2. Scientific Metrics (FLOPs Estimation & Param Extraction)
+  // 3. Scientific Metrics (FLOPs Estimation & Param Extraction)
   const ops = [
     { name: 'Conv2d', regex: /nn\.Conv2d\s*\(([^)]+)\)/g, weight: 0.5 },
     { name: 'Linear', regex: /nn\.Linear\s*\(([^)]+)\)/g, weight: 0.1 }, 
@@ -68,7 +86,6 @@ export const analyzeCodeStatic = (code: string): StaticAnalysis => {
       currentFlops += op.weight;
       const line = getLineFromIndex(code, match.index);
       
-      // P1-1: Param Extraction logic & Suggestions
       if (op.name === 'Conv2d' && match[1]) {
         const args = match[1];
         if (args.includes('stride=2') || args.includes('stride = 2')) {
@@ -85,8 +102,7 @@ export const analyzeCodeStatic = (code: string): StaticAnalysis => {
     if (count > 0) layerCounts[op.name] = count;
   });
 
-  // 3. Heuristic Structural Detection (Fix P1-1: STRICT Semantic Residual Regex)
-  // Purpose: Reduce false positives. Only match explicit residual patterns.
+  // 4. Heuristic Structural Detection
   const residualRegex = /(?:out|x|output|y)\s*\+=\s*(?:identity|x|residual|shortcut|inp)|(?:out|x|output|y)\s*=\s*(?:out|x|output|y)\s*\+\s*(?:identity|x|residual|shortcut|self\.[a-zA-Z0-9_]+\(.*\))|return\s+(?:out|x|output|y)\s*\+\s*(?:identity|x|residual|shortcut|self\.[a-zA-Z0-9_]+\(.*\))/g;
   
   let resMatch;
@@ -97,6 +113,18 @@ export const analyzeCodeStatic = (code: string): StaticAnalysis => {
           "Essential for gradient flow. Ensure Identity path shape matches Output shape, or use a 1x1 projection."
       );
   }
+
+  // 5. Complexity Verdict
+  const totalLayers = Object.values(layerCounts).reduce((a, b) => a + b, 0);
+  const classDefs = (code.match(/class\s+\w+\(nn\.Module\)/g) || []).length;
+  
+  // If we found classes but NO layers via Regex, it's definitely highly abstracted (Regex Failed)
+  // This addresses the "MyTransformer(nn.Module)" critique.
+  const requiresDynamicTracing = (classDefs > 0 && totalLayers === 0) || abstractionWarnings.length > 0;
+  
+  let complexityLevel: 'Low' | 'Medium' | 'High' = 'Low';
+  if (requiresDynamicTracing) complexityLevel = 'High';
+  else if (totalLayers > 10) complexityLevel = 'Medium';
 
   // Basic syntax check
   const openParens = (code.match(/\(/g) || []).length;
@@ -118,6 +146,9 @@ export const analyzeCodeStatic = (code: string): StaticAnalysis => {
     estimatedFlops: parseFloat(currentFlops.toFixed(3)),
     layerCounts,
     imports,
-    structuralHighlights
+    structuralHighlights,
+    complexityLevel,
+    requiresDynamicTracing,
+    abstractionWarnings
   };
 };

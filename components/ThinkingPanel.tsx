@@ -1,5 +1,5 @@
 import React, { useEffect, useRef } from 'react';
-import { Cpu, Terminal, Activity, Zap, Server, BrainCircuit, Code2, Search } from 'lucide-react';
+import { Cpu, Terminal, Activity, Zap, Server, BrainCircuit, Code2, Search, RotateCcw, AlertOctagon } from 'lucide-react';
 
 interface Props {
   streamContent: string;
@@ -18,19 +18,22 @@ export const ThinkingPanel: React.FC<Props> = ({ streamContent, activePhase, isS
   }, [streamContent]);
 
   // Map real phase tags to UI elements
+  // CRITICAL UPDATE: Added 'CORRECTION' phase to show Self-Healing capabilities
   const getPhaseDetails = (phase: string) => {
     switch (phase) {
       case 'SEARCH':
-        return { text: "Tool Call: Google Search (2026 Specs)...", icon: Search, color: "text-blue-400" };
+        return { text: "Tool Call: Google Search (2026 Specs)...", icon: Search, color: "text-blue-400", bg: "bg-blue-500/10" };
       case 'COMPUTE':
-        return { text: "Tool Call: Code Execution (Calc Intensity)...", icon: Terminal, color: "text-orange-400" };
+        return { text: "Sandbox: Verifying Physics Math...", icon: Terminal, color: "text-orange-400", bg: "bg-orange-500/10" };
+      case 'CORRECTION':
+        return { text: "Anomaly Detected. Self-Correcting...", icon: RotateCcw, color: "text-yellow-400", bg: "bg-yellow-500/10" };
       case 'ANALYSIS':
-        return { text: "Cross-referencing MLPerf v4.1...", icon: Server, color: "text-eco-400" };
+        return { text: "Cross-referencing MLPerf v4.1...", icon: Server, color: "text-eco-400", bg: "bg-eco-500/10" };
       case 'STRATEGY':
-        return { text: "Synthesizing Green Strategy...", icon: Cpu, color: "text-white" };
+        return { text: "Synthesizing Green Strategy...", icon: Cpu, color: "text-white", bg: "bg-white/5" };
       default:
         // Default initial state
-        return { text: "Allocating Thinking Budget (1024 Tokens)...", icon: BrainCircuit, color: "text-purple-400" };
+        return { text: "Allocating Thinking Budget (1024 Tokens)...", icon: BrainCircuit, color: "text-purple-400", bg: "bg-purple-500/10" };
     }
   };
 
@@ -56,14 +59,16 @@ export const ThinkingPanel: React.FC<Props> = ({ streamContent, activePhase, isS
       <div className="flex items-center justify-between relative z-10 border-b border-gray-800 pb-4">
         <div className="flex items-center gap-3">
           <div className="relative">
-            <div className="w-3 h-3 bg-eco-500 rounded-full animate-ping absolute inset-0" />
-            <div className="w-3 h-3 bg-eco-500 rounded-full relative" />
+            <div className={`w-3 h-3 rounded-full animate-ping absolute inset-0 ${activePhase === 'CORRECTION' ? 'bg-yellow-500' : 'bg-eco-500'}`} />
+            <div className={`w-3 h-3 rounded-full relative ${activePhase === 'CORRECTION' ? 'bg-yellow-500' : 'bg-eco-500'}`} />
           </div>
           <div>
             <h3 className="font-bold text-white tracking-wide">GEMINI 3 AGENT</h3>
             <div className="flex items-center gap-2">
-               <span className="text-[10px] bg-purple-500/20 text-purple-300 px-1.5 py-0.5 rounded border border-purple-500/30">Thinking</span>
-               <span className="text-[10px] bg-orange-500/20 text-orange-300 px-1.5 py-0.5 rounded border border-orange-500/30">Action</span>
+               <span className="text-[10px] bg-purple-500/20 text-purple-300 px-1.5 py-0.5 rounded border border-purple-500/30">Thinking Mode</span>
+               {activePhase === 'CORRECTION' && (
+                  <span className="text-[10px] bg-yellow-500/20 text-yellow-300 px-1.5 py-0.5 rounded border border-yellow-500/30 animate-pulse">Self-Healing</span>
+               )}
             </div>
           </div>
         </div>
@@ -74,23 +79,32 @@ export const ThinkingPanel: React.FC<Props> = ({ streamContent, activePhase, isS
       </div>
 
       {/* Thinking Budget Visualization */}
-      <div className="relative z-10 py-2">
+      <div className="relative z-10 py-2 group">
          <div className="flex justify-between text-[10px] font-mono text-gray-400 mb-1">
-            <span className="flex items-center gap-1"><BrainCircuit className="w-3 h-3" /> THINKING BUDGET</span>
+            <span className="flex items-center gap-1">
+                <BrainCircuit className="w-3 h-3" /> 
+                THINKING BUDGET (GEMINI 3 EXCLUSIVE)
+            </span>
             <span>{simulatedUsed} / {budget} TOKENS</span>
          </div>
          <div className="w-full h-1.5 bg-gray-800 rounded-full overflow-hidden">
             <div 
-              className="h-full bg-gradient-to-r from-purple-500 via-blue-500 to-eco-500 transition-all duration-300 ease-out"
+              className={`h-full transition-all duration-300 ease-out ${activePhase === 'CORRECTION' ? 'bg-yellow-500' : 'bg-gradient-to-r from-purple-500 via-blue-500 to-eco-500'}`}
               style={{ width: `${progress}%` }}
             />
+         </div>
+         
+         {/* Tooltip for Thinking Budget - "Why this matters" */}
+         <div className="absolute top-full left-0 mt-2 w-64 p-2 bg-black border border-purple-500/30 rounded text-[10px] text-gray-300 opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none z-20">
+            <strong>Why Thinking Budget?</strong><br/>
+            Gemini 3 allocates tokens to "plan" complex physics calculations and self-correct errors <em>before</em> generating the final JSON.
          </div>
       </div>
 
       {/* Active Step Indicator */}
-      <div className={`flex items-center gap-3 py-3 px-4 rounded-lg bg-dark-800/50 border border-gray-700/50 relative z-10 animate-in slide-in-from-left-2 duration-300 transition-colors`}>
-        <div className={`p-1.5 rounded-md bg-white/5 ${currentStep.color}`}>
-           <StepIcon className="w-5 h-5" />
+      <div className={`flex items-center gap-3 py-3 px-4 rounded-lg border border-gray-700/50 relative z-10 animate-in slide-in-from-left-2 duration-300 transition-colors ${currentStep.bg}`}>
+        <div className={`p-1.5 rounded-md bg-black/20 ${currentStep.color}`}>
+           <StepIcon className={`w-5 h-5 ${activePhase === 'CORRECTION' ? 'animate-spin' : ''}`} />
         </div>
         <span className={`font-mono text-sm font-bold ${currentStep.color}`}>{currentStep.text}</span>
       </div>
@@ -98,12 +112,12 @@ export const ThinkingPanel: React.FC<Props> = ({ streamContent, activePhase, isS
       {/* Stream Terminal */}
       <div 
         ref={scrollRef}
-        className="flex-1 bg-black/80 rounded-lg border border-gray-800 p-4 font-mono text-xs text-green-500/90 overflow-y-auto relative z-10 shadow-inner"
+        className={`flex-1 bg-black/80 rounded-lg border p-4 font-mono text-xs overflow-y-auto relative z-10 shadow-inner transition-colors ${activePhase === 'CORRECTION' ? 'border-yellow-500/30 text-yellow-200/90' : 'border-gray-800 text-green-500/90'}`}
       >
         <div className="whitespace-pre-wrap break-all leading-relaxed">
            <span className="opacity-50 select-none">{">_ initializing gemini-3-pro-preview environment...\n"}</span>
            {streamContent}
-           <span className="inline-block w-2 h-4 bg-green-500 ml-1 animate-pulse" />
+           <span className={`inline-block w-2 h-4 ml-1 animate-pulse ${activePhase === 'CORRECTION' ? 'bg-yellow-500' : 'bg-green-500'}`} />
         </div>
       </div>
 

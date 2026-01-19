@@ -1,5 +1,5 @@
 import React, { useRef, useMemo, useState } from 'react';
-import { ImageUp, X, CheckCircle2, AlertOctagon, ExternalLink, Copy, Check, Layers, FileCode, Wand2, Download, ScanLine, ArrowDownToLine, Lightbulb } from 'lucide-react';
+import { ImageUp, X, CheckCircle2, AlertOctagon, ExternalLink, Copy, Check, Layers, FileCode, Wand2, Download, ScanLine, ArrowDownToLine, Lightbulb, Workflow } from 'lucide-react';
 import { analyzeCodeStatic } from '../services/staticAnalyzer';
 
 interface Props {
@@ -40,7 +40,7 @@ export const CodeBlock: React.FC<Props> = ({
   const labelColor = color === 'green' ? 'text-eco-400' : 'text-blue-400';
 
   const staticCheck = useMemo(() => {
-    if (!isEditable) return { isValid: true, errors: [], structuralHighlights: [] };
+    if (!isEditable) return { isValid: true, errors: [], structuralHighlights: [], requiresDynamicTracing: false, abstractionWarnings: [] };
     return analyzeCodeStatic(code);
   }, [code, isEditable]);
 
@@ -210,9 +210,18 @@ export const CodeBlock: React.FC<Props> = ({
         <div className="flex items-center gap-3">
             <span className={`text-xs font-bold tracking-wider uppercase ${labelColor}`}>{label}</span>
             {isEditable && (
-                <div className={`flex items-center gap-1 px-2 py-0.5 rounded text-[10px] font-bold uppercase ${staticCheck.isValid ? 'bg-green-500/20 text-green-400' : 'bg-red-500/20 text-red-400'}`}>
-                    {staticCheck.isValid ? <CheckCircle2 className="w-3 h-3" /> : <AlertOctagon className="w-3 h-3" />}
-                    <span>{staticCheck.isValid ? "Syntax Valid" : "Syntax Error"}</span>
+                <div className={`flex items-center gap-1 px-2 py-0.5 rounded text-[10px] font-bold uppercase ${
+                  !staticCheck.isValid ? 'bg-red-500/20 text-red-400' :
+                  staticCheck.requiresDynamicTracing ? 'bg-purple-500/20 text-purple-400' : 'bg-green-500/20 text-green-400'
+                }`}>
+                    {!staticCheck.isValid ? <AlertOctagon className="w-3 h-3" /> :
+                     staticCheck.requiresDynamicTracing ? <Workflow className="w-3 h-3" /> : <CheckCircle2 className="w-3 h-3" />
+                    }
+                    <span>
+                      {!staticCheck.isValid ? "Syntax Error" :
+                       staticCheck.requiresDynamicTracing ? "Dynamic Graph Detected" : "Static Scan Valid"
+                      }
+                    </span>
                 </div>
             )}
         </div>
@@ -365,6 +374,19 @@ export const CodeBlock: React.FC<Props> = ({
                    </div>
                 )}
 
+                {/* New: Abstraction/Regex Warning UI */}
+                {staticCheck.requiresDynamicTracing && (
+                    <div className="bg-purple-900/90 border border-purple-500/50 p-2 rounded text-xs text-purple-200 backdrop-blur-md mb-2 animate-in fade-in pointer-events-auto cursor-help" title="Switching to Torch.fx or ONNX Tracing is required for full accuracy.">
+                        <p className="font-bold flex items-center gap-1"><Workflow className="w-3 h-3" /> Abstraction Detected:</p>
+                        <p className="opacity-80 mt-1">Regex analysis is limited. Backend will switch to <strong>Dynamic Tracing (torch.fx)</strong>.</p>
+                        {staticCheck.abstractionWarnings.length > 0 && (
+                            <ul className="list-disc list-inside opacity-70 mt-1 text-[10px]">
+                                {staticCheck.abstractionWarnings.map((w, i) => <li key={i}>{w}</li>)}
+                            </ul>
+                        )}
+                    </div>
+                )}
+
                 {!staticCheck.isValid && (
                     <div className="bg-red-900/90 border border-red-500/50 p-2 rounded text-xs text-red-200 backdrop-blur-md mb-2 animate-in fade-in">
                         <p className="font-bold">Pre-flight Check Failed:</p>
@@ -374,7 +396,7 @@ export const CodeBlock: React.FC<Props> = ({
                     </div>
                 )}
                 {/* P1-1: Show Smart Highlights */}
-                {staticCheck.isValid && staticCheck.structuralHighlights && staticCheck.structuralHighlights.length > 0 && (
+                {staticCheck.isValid && !staticCheck.requiresDynamicTracing && staticCheck.structuralHighlights && staticCheck.structuralHighlights.length > 0 && (
                     <div className="bg-blue-900/80 border border-blue-500/30 p-2 rounded text-[10px] text-blue-200 backdrop-blur-md animate-in fade-in flex flex-wrap gap-2 pointer-events-auto">
                         <span className="font-bold uppercase opacity-70 flex items-center gap-1">
                           <ScanLine className="w-3 h-3" />

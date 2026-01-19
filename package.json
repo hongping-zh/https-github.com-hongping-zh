@@ -6,7 +6,6 @@
   "scripts": {
     "dev": "vite",
     "build": "vite build",
-    "postbuild": "node scripts/create404.cjs",
     "preview": "vite preview"
   },
   "dependencies": {

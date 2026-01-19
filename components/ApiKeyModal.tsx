@@ -1,39 +1,27 @@
-import React, { useState, useEffect } from 'react';
-import { Key, Lock, ExternalLink, CheckCircle2, AlertCircle, AlertTriangle, PlayCircle } from 'lucide-react';
+import React, { useState } from 'react';
+import { Key, ExternalLink, ShieldCheck, Save, AlertTriangle, PlayCircle } from 'lucide-react';
 
-interface ApiKeyModalProps {
+interface Props {
   isOpen: boolean;
   onSave: (key: string) => void;
   onClose: () => void;
-  onViewSample: () => void;
+  onViewSample: () => void; // New prop for demo mode
   hasKey: boolean;
 }
 
-export const ApiKeyModal: React.FC<ApiKeyModalProps> = ({ isOpen, onSave, onClose, onViewSample, hasKey }) => {
-  const [key, setKey] = useState('');
+export const ApiKeyModal: React.FC<Props> = ({ isOpen, onSave, onClose, onViewSample, hasKey }) => {
+  const [inputKey, setInputKey] = useState('');
   const [error, setError] = useState('');
-  
-  // Clear input when modal opens
-  useEffect(() => {
-    if (isOpen) {
-      setKey('');
-      setError('');
-    }
-  }, [isOpen]);
 
   if (!isOpen) return null;
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!key.trim()) {
-      setError('Please enter a valid API key');
+  const handleSave = () => {
+    if (!inputKey.trim().startsWith('AIza')) {
+      setError('Invalid API Key format. It usually starts with "AIza".');
       return;
     }
-    if (!key.startsWith('AIza')) {
-      setError('That doesn\'t look like a valid Gemini API key (starts with AIza...)');
-      return;
-    }
-    onSave(key.trim());
+    onSave(inputKey.trim());
+    onClose();
   };
 
   const handleDemoMode = () => {
@@ -42,117 +30,104 @@ export const ApiKeyModal: React.FC<ApiKeyModalProps> = ({ isOpen, onSave, onClos
   };
 
   return (
-    <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm animate-in fade-in duration-200">
-      <div className="bg-[#1e1e2e] border border-gray-700 rounded-2xl max-w-md w-full shadow-2xl overflow-hidden animate-in zoom-in-95 duration-200">
+    <div className="fixed inset-0 z-[200] flex items-center justify-center p-4 bg-black/80 backdrop-blur-md animate-in fade-in duration-300">
+      <div className="bg-[#181825] border border-gray-700 w-full max-w-md rounded-2xl shadow-2xl relative overflow-hidden">
         
-        {/* Header */}
-        <div className="bg-gradient-to-r from-eco-900/50 to-purple-900/50 p-6 border-b border-gray-700">
-          <div className="flex items-center gap-3 mb-2">
-            <div className="p-2 bg-eco-500/20 rounded-lg border border-eco-500/30">
-              <Key className="w-6 h-6 text-eco-400" />
+        {/* Decorative Header */}
+        <div className="h-2 w-full bg-gradient-to-r from-blue-500 via-eco-500 to-purple-500" />
+        
+        <div className="p-8">
+          <div className="flex items-center gap-3 mb-6">
+            <div className="bg-eco-500/20 p-3 rounded-xl border border-eco-500/30">
+               <Key className="w-6 h-6 text-eco-400" />
             </div>
-            <h2 className="text-xl font-bold text-white">Setup Gemini API</h2>
-          </div>
-          <p className="text-sm text-gray-300">
-            EcoCompute AI runs 100% in your browser. Bring your own key to get started.
-          </p>
-        </div>
-
-        {/* Content */}
-        <div className="p-6 space-y-6">
-          
-          <div className="bg-blue-500/10 border border-blue-500/20 rounded-xl p-4 flex gap-3">
-             <Lock className="w-5 h-5 text-blue-400 shrink-0 mt-0.5" />
-             <div className="text-xs text-blue-200">
-               <strong className="block mb-1 text-blue-100">Zero-Server Privacy</strong>
-               Your API key is stored locally in your browser's <code className="bg-black/30 px-1 py-0.5 rounded">localStorage</code>. 
-               It is never sent to our servers. We communicate directly with Google's API from your client.
-             </div>
+            <div>
+              <h2 className="text-xl font-bold text-white">Setup Gemini 3</h2>
+              <p className="text-xs text-gray-400">Bring Your Own Key (BYOK)</p>
+            </div>
           </div>
 
-          <div className="bg-orange-500/10 border border-orange-500/20 rounded-xl p-4 flex gap-3">
-             <AlertTriangle className="w-5 h-5 text-orange-400 shrink-0 mt-0.5" />
-             <div className="text-xs text-orange-200">
-               <strong className="block mb-1 text-orange-100">Quota Note (Free Tier)</strong>
-               Free API keys can hit strict rate limits (429 / RESOURCE_EXHAUSTED). If that happens, wait a moment, retry, or use a paid key.
-             </div>
-          </div>
-
-          <form onSubmit={handleSubmit} className="space-y-4">
-            <div className="space-y-2">
-              <label htmlFor="apiKey" className="text-sm font-medium text-gray-300 block">
-                Enter your Gemini API Key
-              </label>
-              <input
-                id="apiKey"
-                type="password"
-                value={key}
-                onChange={(e) => {
-                  setKey(e.target.value);
-                  setError('');
-                }}
-                placeholder="AIzaSy..."
-                className="w-full bg-black/30 border border-gray-700 rounded-lg px-4 py-3 text-white placeholder-gray-600 focus:outline-none focus:border-eco-500 focus:ring-1 focus:ring-eco-500 transition-all font-mono text-sm"
-              />
-              {error && (
-                <div className="flex items-center gap-2 text-red-400 text-xs mt-2 animate-in slide-in-from-top-1">
-                  <AlertCircle className="w-3 h-3" />
-                  {error}
-                </div>
-              )}
+          <div className="space-y-4 mb-6">
+            <div className="bg-blue-900/20 border border-blue-500/20 p-4 rounded-lg">
+                <p className="text-sm text-blue-200 leading-relaxed flex gap-2">
+                    <ShieldCheck className="w-5 h-5 shrink-0 text-blue-400" />
+                    <span>
+                        For security, this demo runs <strong>entirely in your browser</strong>. 
+                        Your API Key is saved to local storage and never sent to our servers.
+                    </span>
+                </p>
+            </div>
+            
+            {/* Rate Limit Warning */}
+            <div className="bg-orange-900/20 border border-orange-500/20 p-3 rounded-lg flex gap-2 items-start">
+                 <AlertTriangle className="w-4 h-4 text-orange-400 mt-0.5 shrink-0" />
+                 <p className="text-xs text-orange-200">
+                    <strong>Note:</strong> Free tier keys have strictly limited quotas (RPM/TPM). 
+                    If you see "Quota Exceeded" errors, please wait a minute or use a paid key.
+                 </p>
             </div>
 
-            <button
-              type="submit"
-              className="w-full bg-eco-600 hover:bg-eco-500 text-white font-semibold py-3 rounded-xl transition-all shadow-[0_0_15px_rgba(22,163,74,0.3)] hover:shadow-[0_0_25px_rgba(22,163,74,0.5)] flex items-center justify-center gap-2"
-            >
-              <CheckCircle2 className="w-4 h-4" />
-              Save & Connect
-            </button>
-          </form>
+            <div>
+                <label className="block text-xs font-bold uppercase text-gray-500 mb-2">Gemini API Key</label>
+                <input 
+                    type="password" 
+                    value={inputKey}
+                    onChange={(e) => {
+                        setInputKey(e.target.value);
+                        setError('');
+                    }}
+                    placeholder="AIzaSy..."
+                    className="w-full bg-black/40 border border-gray-700 rounded-lg px-4 py-3 text-white focus:border-eco-500 focus:outline-none focus:ring-1 focus:ring-eco-500/50 placeholder-gray-600 font-mono text-sm"
+                />
+                {error && <p className="text-red-400 text-xs mt-2 flex items-center gap-1"><AlertTriangle className="w-3 h-3" /> {error}</p>}
+            </div>
 
-          <div className="flex gap-3">
-            <button
-              type="button"
-              onClick={handleDemoMode}
-              className="flex-1 flex items-center justify-center gap-2 px-4 py-2 rounded-xl border border-purple-500/30 text-purple-300 hover:bg-purple-500/10 transition-colors text-xs font-medium"
-            >
-              <PlayCircle className="w-3 h-3" />
-              Try Demo (No Key)
-            </button>
-
-            {hasKey && (
-              <button
-                type="button"
-                onClick={onClose}
-                className="px-4 py-2 rounded-xl border border-gray-700 text-gray-400 hover:text-white hover:bg-gray-800 transition-colors text-xs font-medium"
-              >
-                Cancel
-              </button>
-            )}
+            <div className="flex items-center justify-between text-xs text-gray-400">
+                <span>Don't have a key?</span>
+                <a 
+                    href="https://aistudio.google.com/app/apikey" 
+                    target="_blank" 
+                    rel="noreferrer"
+                    className="flex items-center gap-1 text-eco-400 hover:text-eco-300 hover:underline"
+                >
+                    Get one free from AI Studio <ExternalLink className="w-3 h-3" />
+                </a>
+            </div>
           </div>
 
-          <div className="pt-4 border-t border-gray-800 text-center">
-             <a 
-               href="https://aistudio.google.com/app/apikey" 
-               target="_blank" 
-               rel="noreferrer"
-               className="inline-flex items-center gap-1 text-xs text-gray-400 hover:text-eco-400 transition-colors"
+          <div className="flex flex-col gap-3">
+             <button 
+                onClick={handleSave}
+                disabled={!inputKey}
+                className={`w-full flex items-center justify-center gap-2 px-4 py-2.5 rounded-lg font-bold text-sm transition-all
+                    ${inputKey 
+                        ? 'bg-eco-600 hover:bg-eco-500 text-white shadow-lg shadow-eco-900/20' 
+                        : 'bg-gray-800 text-gray-500 cursor-not-allowed'}
+                `}
              >
-               Get a free Gemini API Key <ExternalLink className="w-3 h-3" />
-             </a>
+                <Save className="w-4 h-4" />
+                Save Key & Start
+             </button>
+             
+             <div className="flex gap-3">
+                <button 
+                    onClick={handleDemoMode}
+                    className="flex-1 flex items-center justify-center gap-2 px-4 py-2 rounded-lg border border-purple-500/30 text-purple-300 hover:bg-purple-500/10 transition-colors text-xs font-medium"
+                >
+                    <PlayCircle className="w-3 h-3" />
+                    Try Demo (No Key)
+                </button>
+                {hasKey && (
+                    <button 
+                        onClick={onClose}
+                        className="px-4 py-2 rounded-lg border border-gray-700 text-gray-400 hover:text-white hover:bg-gray-800 transition-colors text-xs font-medium"
+                    >
+                        Cancel
+                    </button>
+                )}
+             </div>
           </div>
         </div>
-        
-        {hasKey && (
-           <button 
-             onClick={onClose}
-             className="absolute top-4 right-4 text-gray-500 hover:text-white transition-colors"
-           >
-             ✕
-           </button>
-        )}
-
       </div>
     </div>
   );

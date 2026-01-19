@@ -7,6 +7,7 @@ export interface HardwareProfile {
   efficiency: string; // e.g. "Low", "Medium", "High"
   region?: string; // e.g., "us-central1"
   carbonIntensity?: number; // gCO2/kWh
+  isVerified?: boolean; // NEW: Solves "Hallucination" critique. True = Hardcoded/Trusted DB.
 }
 
 export interface EnergyBreakdownItem {
@@ -22,12 +23,15 @@ export interface RecommendationItem {
   gain: string; // e.g. "15-20%"
   reasoning: string;
   category: 'High' | 'Medium' | 'Exploratory';
+  accuracyRisk: 'None' | 'Low' | 'Medium' | 'High'; // NEW: Solves "Accuracy Risk"
+  estAccuracyDrop?: string; // e.g. "< 0.1%"
 }
 
 export interface TradeoffMetrics {
   performanceScore: number; // 0-100 (Higher is faster)
   costEfficiencyScore: number; // 0-100 (Higher is cheaper)
   carbonEfficiencyScore: number; // 0-100 (Higher is greener)
+  accuracySafetyScore: number; // NEW: 0-100 (100 = No accuracy loss)
 }
 
 export interface BenchmarkData {
@@ -45,27 +49,32 @@ export interface AnalysisResult {
   improvementPercentage: number;
   carbonSavedGrams: number;
   
-  estimatedHourlyCost?: number;
-  costSavingsPer1MInference?: number;
+  // FinOps / Cost Analysis
+  estimatedHourlyCost: number; 
+  costSavingsPer1MInference: number; 
   
+  // Uncertainty / Error Bars
+  energyErrorMargin: number; 
+  costErrorMargin: number; 
+
   // Uncertainty Quantification
-  confidenceScore: number; // 0.0 to 1.0
-  uncertaintyFactors: string[]; // List of factors lowering confidence
-  strategyAnalysis: string; // Strategic advice based on confidence level
+  confidenceScore: number; 
+  uncertaintyFactors: string[]; 
+  strategyAnalysis: string; 
   
   // Decision Support
-  tradeoffMetrics: TradeoffMetrics; // New: Triangle Model Data
+  tradeoffMetrics: TradeoffMetrics; 
 
-  // Transparency & Explainability (P0-3)
-  assumptions: string[]; // e.g., "Batch Size = 1", "FP16 Precision"
-  citations: string[]; // e.g., "NVIDIA B200 Datasheet (2025)"
-  energy_model: string; // Explanation of how GFLOPs -> Joules was derived
+  // Transparency & Explainability
+  assumptions: string[]; 
+  citations: string[]; 
+  energy_model: string; 
 
   // MLPerf Validation
   benchmarkData?: BenchmarkData;
 
   // Qualitative Analysis
-  reasoning_trace: string; // Explicit Chain of Thought
+  reasoning_trace: string; 
   bottleneckAnalysis: string;
   impactAnalogy: string;
   
@@ -92,10 +101,61 @@ export interface DataFlywheelStage {
 }
 
 export const EXAMPLES: Record<string, string> = {
-  'ResNet-50 Block': `import torch
+  'Llama 3 Attention (GQA)': `import torch
+import torch.nn as nn
+import torch.nn.functional as F
+import math
+
+class LlamaGQA(nn.Module):
+    """
+    Llama 3 Style Grouped Query Attention (GQA).
+    Optimized for reduced KV cache memory bandwidth.
+    """
+    def __init__(self, dim=4096, n_heads=32, n_kv_heads=8):
+        super().__init__()
+        self.n_heads = n_heads
+        self.n_kv_heads = n_kv_heads
+        self.n_rep = n_heads // n_kv_heads # Replication factor (e.g. 4)
+        self.head_dim = dim // n_heads
+        
+        # GQA: Query has n_heads, Keys/Values have fewer n_kv_heads
+        self.wq = nn.Linear(dim, n_heads * self.head_dim, bias=False)
+        self.wk = nn.Linear(dim, n_kv_heads * self.head_dim, bias=False)
+        self.wv = nn.Linear(dim, n_kv_heads * self.head_dim, bias=False)
+        self.wo = nn.Linear(n_heads * self.head_dim, dim, bias=False)
+
+    def forward(self, x):
+        b, s, d = x.shape
+        
+        # Projections
+        xq = self.wq(x).view(b, s, self.n_heads, self.head_dim)
+        xk = self.wk(x).view(b, s, self.n_kv_heads, self.head_dim)
+        xv = self.wv(x).view(b, s, self.n_kv_heads, self.head_dim)
+        
+        # GQA: Repeat KV heads to match Query heads virtually
+        # In optimized inference (vLLM), we don't physically repeat, but for Torch logic we do:
+        xk = xk.repeat_interleave(self.n_rep, dim=2)
+        xv = xv.repeat_interleave(self.n_rep, dim=2)
+        
+        # Transpose for Attention: (B, H, S, D)
+        xq, xk, xv = xq.transpose(1, 2), xk.transpose(1, 2), xv.transpose(1, 2)
+        
+        # Scaled Dot-Product Attention
+        scores = torch.matmul(xq, xk.transpose(-2, -1)) / math.sqrt(self.head_dim)
+        scores = F.softmax(scores.float(), dim=-1).type_as(xq)
+        output = torch.matmul(scores, xv)
+        
+        output = output.transpose(1, 2).contiguous().view(b, s, -1)
+        return self.wo(output)`,
+
+  'ResNet-50 Block (Baseline)': `import torch
 import torch.nn as nn
 
 class Bottleneck(nn.Module):
+    """
+    Standard ResNet-50 Bottleneck. 
+    Used as the 'Calibration Baseline' for EcoCompute's physics engine.
+    """
     expansion = 4
     def __init__(self, inplanes, planes, stride=1):
         super(Bottleneck, self).__init__()
@@ -122,7 +182,6 @@ class Bottleneck(nn.Module):
         out = self.bn3(out)
         
         if stride != 1 or inplanes != planes * self.expansion:
-             # This skip connection logic is often a bottleneck if not fused
              identity = nn.Sequential(
                 nn.Conv2d(inplanes, planes * self.expansion, kernel_size=1, stride=stride, bias=False),
                 nn.BatchNorm2d(planes * self.expansion),
@@ -195,7 +254,7 @@ class InvertedResidual(nn.Module):
             return self.conv(x)`
 };
 
-export const INITIAL_CODE = EXAMPLES['ResNet-50 Block'];
+export const INITIAL_CODE = EXAMPLES['ResNet-50 Block (Baseline)'];
 
 // A hand-drawn style SVG of a Residual Block topology
-export const DEMO_SKETCH = `data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA4MDAgNDUwIiBzdHlsZT0iYmFja2dyb3VuZC1jb2xvcjogd2hpdGU7Ij4KICA8ZGVmcz4KICAgIDxtYXJrZXIgaWQ9ImFycm93IiBtYXJrZXJXaWR0aD0iMTAiIG1hcmtlckhlaWdodD0iMTAiIHJlZlg9IjkiIHJlZlk9IjMiIG9yaWVudD0iYXV0byI+CiAgICAgIDxwYXRoIGQ9Ik0wLDAgTDAsNiBMOSwzIHoiIGZpbGw9IiMzMzMiIC8+CiAgICA8L21hcmtlcj4KICA8L2RlZnM+CiAgPHN0eWxlPgogICAgdGV4dCB7IGZvbnQtZmFtaWx5OiAnQ29taWMgU2FucyBNUycsICdDaGFsa2JvYXJkIFNFJywgc2Fucy1zZXJpZjsgZm9udC1zaXplOiAxNnB4OyBmaWxsOiAjMzMzOyB9CiAgICBwYXRoLCByZWN0IHsgc3Ryb2tlOiAjMzMzOyBzdHJva2Utd2lkdGg6IDI7IGZpbGw6IG5vbmU7IHN0cm9rZS1saW5lY2FwOiByb3VuZDsgc3Ryb2tlLWxpbmVqb2luOiByb3VuZDsgfQogIDwvc3R5bGU+CiAgCiAgPCEtLSBJbnB1dCAtLT4KICA8cmVjdCB4PSI1MCIgeT0iMTg1IiB3aWR0aD0iNjAiIGhlaWdodD0iNjAiIHJ4PSI1IiAvPgogIDx0ZXh0IHg9IjU1IiB5PSIyMjAiPklucHV0PC90ZXh0PgogIDx0ZXh0IHg9IjQ1IiB5PSIyNjUiIHN0eWxlPSJmb250LXNpemU6MTJweCI+KHgsIGluX2NoKQo8L3RleHQ+CgogIDwhLS0gQXJyb3cgLS0+CiAgPHBhdGggZD0iTTEyMCAyMTUgSCAxNjAiIG1hcmtlci1lbmQ9InVybCgjYXJyb3cpIiAvPgoKICA8IS0tIFJlc0Jsb2NrIEJveCAtLT4KICA8cmVjdCB4PSIxNzAiIHk9IjkwIiB3aWR0aD0iMjgwIiBoZWlnaHQ9IjI1MCIgc3Ryb2tlLWRhc2hhcnJheT0iNSw1IiBzdHJva2U9IiM2NjYiIC8+CiAgPHRleHQgeD0iMTgwIiB5PSI4MCIgc3R5bGU9ImZpbGw6IzY2NiI+Qm90dGxlbmVjayBCbG9jazwvdGV4dD4KCiAgPCEtLSBDb252IDEgLS0+CiAgPHJlY3QgeD0iMTkwIiB5PSIxMTAiIHdpZHRoPSI4MCIgaGVpZ2h0PSI0MCIgLz4KICA8dGV4dCB4PSIyMDUiIHk9IjEzNSI+Q29udjE8L3RleHQ+CiAgPHRleHQgeD0iMjg1IiB5PSIxMzUiIHN0eWxlPSJmb250LXNpemU6MTJweCI+MXgxPC90ZXh0PgoKICA8IS0tIEFycm93IC0tPgogIDxwYXRoIGQ9Ik0yMzAgMTU1IFYgMTgwIiBtYXJrZXItZW5kPSJ1cmwoI2Fycm93KSIgLz4KCiAgPCEtLSBDb252IDIgLS0+CiAgPHJlY3QgeD0iMTkwIiB5PSIxOTAiIHdpZHRoPSI4MCIgaGVpZ2h0PSI0MCIgLz4KICA8dGV4dCB4PSIyMDUiIHk9IjIxNSI+Q29udjI8L3RleHQ+CiAgPHRleHQgeD0iMjg1IiB5PSIyMTUiIHN0eWxlPSJmb250LXNpemU6MTJweCI+M3gzPC90ZXh0PgoKICA8IS0tIEFycm93IC0tPgogIDxwYXRoIGQ9Ik0yMzAgMjM1IFYgMjYwIiBtYXJrZXItZW5kPSJ1cmwoI2Fycm93KSIgLz4KICA8IS0tIENvbnYgMyAtLT4KICA8cmVjdCB4PSIxOTAiIHk9IjI3MCIgd2lkdGg9IjgwIiBoZWlnaHQ9IjQwIiAvPgogIDx0ZXh0IHg9IjIwNSIgeT0iMjk1Ij5Db252MzwvdGV4dD4KICA8dGV4dCB4PSIyODUiIHk9IjI5NSIgc3R5bGU9ImZvbnQtc2l6ZToxMnB4Ij4xeDE8L3RleHQ+CgogIDwhLS0gU2tpcCBDb25uZWN0aW9uIC0tPgogIDxwYXRoIGQ9Ik0xNjAgMjE1IFYgMzUwIEggMzgwIiBzdHlsZT0ic3Ryb2tlOiAjMjJjNTVlOyIgLz4KICA8dGV4dCB4PSIyMDAiIHk9IjM3MCIgc3R5bGU9ImZpbGw6IzIyYzU1ZTsgZm9udC1zaXplOjEycHgiPklkZW50aXR5IChTa2lwKTwvdGV4dD4KCiAgPCEtLSBSZWx1IC8gQWRkIC0tPgogIDxjaXJjbGUgY3g9IjQwMCIgY3k9IjI5MCIgcj0iMTUiIC8+CiAgPHRleHQgeD0iMzkzIiB5PSIyOTUiIHN0eWxlPSJmb250LXdlaWdodDpib2xkIj4rPC90ZXh0PgoKICA8IS0tIEFycm93IC0tPgogIDxwYXRoIGQ9Ik0yNzAgMjkwIEggMzgwIiBtYXJrZXItZW5kPSJ1cmwoI2Fycm93KSIgLz4KICA8cGF0aCBkPSJNNDAwIDM1MCBWIDMxMCIgbWFya2VyLWVuZD0idXJsKCNhcnJvdykiIC8+CiAgPCEtLSBPdXRwdXQgLS0+CiAgPHBhdGggZD0iTTQxNSAyOTAgSCA0NjAiIG1hcmtlci1lbmQ9InVybCgjYXJyb3cpIiAvPgogIDxyZWN0IHg9IjQ2MCIgeT0iMjY1IiB3aWR0aD0iNjAiIGhlaWdodD0iNTAiIC8+CiAgPHRleHQgeD0iNDcwIiB5PSIyOTUiPk91dDwvdGV4dD4KPC9zdmc+`;
+export const DEMO_SKETCH = `data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA4MDAgNDUwIiBzdHlsZT0iYmFja2dyb3VuZC1jb2xvcjogd2hpdGU7Ij4KICA8ZGVmcz4KICAgIDxtYXJrZXIgaWQ9ImFycm93IiBtYXJrZXJXaWR0aD0iMTAiIG1hcmtlckhlaWdodD0iMTAiIHJlZlg9IjkiIHJlZlk9IjMiIG9yaWVudD0iYXV0byI+CiAgICAgIDxwYXRoIGQ9Ik0wLDAgTDAsNiBMOSwzIHoiIGZpbGw9IiMzMzMiIC8+CiAgICA8L21hcmtlcj4KICA8L2RlZnM+CiAgPHN0eWxlPgogICAgdGV4dCB7IGZvbnQtZmFtaWx5OiAnQ29taWMgU2FucyBNUycsICdDaGFsa2JvYXJkIFNFJywgc2Fucy1zZXJpZjsgZm9udC1zaXplOiAxNnB4OyBmaWxsOiAjMzMzOyB9CiAgICBwYXRoLCByZWN0IHsgc3Ryb2tlOiAjMzMzOyBzdHJva2Utd2lkdGg6IDI7IGZpbGw6IG5vbmU7IHN0cm9rZS1saW5lY2FwOiByb3VuZDsgc3Ryb2tlLWxpbmVqb2luOiByb3VuZDsgfQogIDwvc3R5bGU+CiAgCiAgPCEtLSBJbnB1dCAtLT4KICA8cmVjdCB4PSI1MCIgeT0iMTg1IiB3aWR0aD0iNjAiIGhlaWdodD0iNjAiIHJ4PSI1IiAvPgogIDx0ZXh0IHg9IjU1IiB5PSIyMjAiPklucHV0PC90ZXh0PgogIDx0ZXh0IHg9IjQ1IiB5PSIyNjUiIHN0eWxlPSJmb250LXNpemU6MTJweCI+KHgsIGluX2NoKQo8L3RleHQ+CgogIDwhLS0gQXJyb3cgLS0+CiAgPHBhdGggZD0iTTEyMCAyMTUgSCAxNjAiIG1hcmtlci1lbmQ9InVybCgjYXJyb3cpIiAvPgoKICA8IS0tIFJlc0Jsb2NrIEJveCAtLT4KICA8cmVjdCB4PSIxNzAiIHk9IjkwIiB3aWR0aD0iMjgwIiBoZWlnaHQ9IjI1MCIgc3Ryb2tlLWRhc2hhcnJheT0iNSw1IiBzdHJva2U9IiM2NjYiIC8+CiAgPHRleHQgeD0iMTgwIiB5PSI4MCIgc3R5bGU9ImZpbGw6IzY2NiI+Qm90dGxlbmVjayBCbG9jazwvdGV4dD4KCiAgPCEtLSBDb252IDEgLS0+CiAgPHJlY3QgeD0iMTkwIiB5PSIxMTAiIHdpZHRoPSI4MCIgaGVpZ2h0PSI0MCIgLz4KICA8dGV4dCB4PSIyMDUiIHk9IjEzNSI+Q29udjE8L3RleHQ+CiAgPHRleHQgeD0iMjg1IiB5PSIxMzUiIHN0eWxlPSJmb250LXNpemU6MTJweCI+MXgxPC90ZXh0PgoKICA8IS0tIEFycm93IC0tPgogIDxwYXRoIGQ9Ik0yMzAgMTU1IFYgMTgwIiBtYXJrZXItZW5kPSJ1cmwoI2Fycm93KSIgLz4KICA8IS0tIENvbnYgMyAtLT4KICA8cmVjdCB4PSIxOTAiIHk9IjE5MCIgd2lkdGg9IjgwIiBoZWlnaHQ9IjQwIiAvPgogIDx0ZXh0IHg9IjIwNSIgeT0iMjE1Ij5Db252MzwvdGV4dD4KICA8dGV4dCB4PSIyODUiIHk9IjIxNSIgc3R5bGU9ImZvbnQtc2l6ZToxMnB4Ij4xeDE8L3RleHQ+CgogIDwhLS0gQXJyb3cgLS0+CiAgPHBhdGggZD0iTTIzMCAyMzUgViAyNjAiIG1hcmtlci1lbmQ9InVybCgjYXJyb3cpIiAvPgogIDwhLS0gQ29udiAzIC0tPgogIDxyZWN0IHg9IjE5MCIgeT0iMjcwIiB3aWR0aD0iODAiIGhlaWdodD0iNDAiIC8+CiAgPHRleHQgeD0iMjA1IiB5PSIyOTUiPkNvbnYzPC90ZXh0PgogIDx0ZXh0IHg9IjIwNSIgeT0iMjk1IiBzdHlsZT0iZm9udC1zaXplOjEycHgiPjF4MTwvdGV4dD4KCiAgPCEtLSBTa2lwIENvbm5lY3Rpb24gLS0+CiAgPHBhdGggZD0iTTE2MCAyMTUgViAzNTAgSCAzODAiIHN0eWxlPSJzdHJva2U6ICMyMmM1NWU7IiAvPgogIDx0ZXh0IHg9IjIwMCIgeT0iMzcwIiBzdHlsZT0iZmlsbDojMjJjNTVlOyBmb250LXNpemU6MTJweCI+SWRlbnRpdHkgKFNraXApPC90ZXh0PgoKICA8IS0tIFJlbHUgLyBBZGQgLS0+CiAgPGNpcmNsZSBjeD0iNDAwIiBjeT0iMjkwIiByPSIxNSIgLz4KICA8dGV4dCB4PSIzOTMiIHk9IjI5NSIgc3R5bGU9ImZvbnQtd2VpZ2h0OmJvbGQiPis8L3RleHQ+CgogIDwhLS0gQXJyb3cgLS0+CiAgPHBhdGggZD0iTTI3MCAyOTAgSCAzODAiIG1hcmtlci1lbmQ9InVybCgjYXJyb3cpIiAvPgogIDxwYXRoIGQ9Ik00MDAgMzUwIFYgMzEwIiBtYXJrZXItZW5kPSJ1cmwoI2Fycm93KSIgLz4KICA8IS0tIE91dHB1dCAtLT4KICA8cGF0aCBkPSJNNDE1IDI5MCBIIDQ2MCIgbWFya2VyLWVuZD0idXJsKCNhcnJvdykiIC8+CiAgPHJlY3QgeD0iNDYwIiB5PSIyNjUiIHdpZHRoPSI2MCIgaGVpZ2h0PSI1MCIgLz4KICA8dGV4dCB4PSI0NzAiIHk9IjI5NSI+T3V0PC90ZXh0Pgo8L3N2Zz4=`;

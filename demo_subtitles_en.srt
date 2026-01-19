@@ -1,71 +1,40 @@
+
 1
-00:00:01,000 --> 00:00:08,000
-Did you know training a single LLM can emit as much carbon as five cars over their entire lifetimes?
+00:00:00,000 --> 00:00:04,500
+Training AI isn't just an environmental crisis—it's a financial one.
 
 2
-00:00:08,500 --> 00:00:15,000
-Meet EcoCompute AI, the first "Green AI" Architect powered by Gemini 3 Pro.
+00:00:04,500 --> 00:00:09,000
+Cloud bills are exploding, and monitoring tools only show symptoms, not root causes.
 
 3
-00:00:15,500 --> 00:00:23,000
-It’s not just a linter. It’s a virtual Performance Engineer that sees your architecture—literally.
+00:00:09,000 --> 00:00:14,000
+Meet EcoCompute AI. The "Green FinOps" infrastructure that stops bill shock at the source.
 
 4
-00:00:23,500 --> 00:00:31,000
-You can paste your PyTorch code or even upload a hand-drawn sketch of your neural network.
+00:00:14,000 --> 00:00:19,000
+Acting as a Gatekeeper in your CI/CD pipeline, we intercept inefficient code before it merges.
 
 5
-00:00:31,500 --> 00:00:40,000
-Gemini 3 analyzes the visual topology to detect hidden bottlenecks that static analysis might miss.
+00:00:19,000 --> 00:00:23,000
+Let's audit a Llama 3 Attention block targeting the new NVIDIA B200.
 
 6
-00:00:40,500 --> 00:00:49,000
-But we don't just guess. EcoCompute uses Gemini's Agentic capabilities to ground every decision.
+00:00:23,000 --> 00:00:28,000
+Powered by Gemini 3, we use Google Search to fetch real-time 2026 hardware specs.
 
 7
-00:00:49,500 --> 00:00:59,000
-Watch as it uses Google Search to pull real-time 2026 hardware specs, like the latest NVIDIA B200 TDPs.
+00:00:28,000 --> 00:00:33,000
+But here's the magic. We force the Agent to use a Python Sandbox to verify its math.
 
 8
-00:00:59,500 --> 00:01:10,000
-Then, it uses the Code Execution tool to write and run Python scripts in a sandbox, verifying Arithmetic Intensity math.
+00:00:33,000 --> 00:00:38,500
+Watch this: It detected an anomaly, self-corrected its assumptions, and re-ran the calculation.
 
 9
-00:01:10,500 --> 00:01:19,000
-The result? A comprehensive "Deep Energy Audit" with a structured breakdown of Joules and Carbon.
+00:00:38,500 --> 00:00:44,000
+The result? It proves that optimizing this block saves $42 per million inferences.
 
 10
-00:01:19,500 --> 00:01:28,000
-Check out the "Decision Triangle." It forces you to balance Performance, Cost, and Carbon Efficiency.
-
-11
-00:01:28,500 --> 00:01:38,000
-It doesn't just complain; it fixes. Here, Gemini auto-refactors the code, applying quantization and LoRA optimizations.
-
-12
-00:01:38,500 --> 00:01:48,000
-Under the hood, we built a "Hybrid Grounding System." We combine deterministic AST analysis with probabilistic LLM reasoning.
-
-13
-00:01:48,500 --> 00:01:58,000
-We even cross-reference predictions against the MLPerf Inference v4.1 database for ground-truth accuracy.
-
-14
-00:01:58,500 --> 00:02:08,000
-The "Thinking Panel" shows you exactly how the model reasons, planning its search queries and calculations step-by-step.
-
-15
-00:02:08,500 --> 00:02:18,000
-With EcoCompute AI, developers can reduce their model's energy consumption by 30 to 50 percent.
-
-16
-00:02:18,500 --> 00:02:28,000
-Sustainable AI isn't just a goal; it's a responsibility. Join us in democratizing Green AI expertise.
-
-17
-00:02:28,500 --> 00:02:35,000
-EcoCompute AI. Let's Code Green.
-
-18
-00:02:35,500 --> 00:02:47,000
-[EcoCompute AI - Powered by Gemini 3]
+00:00:44,000 --> 00:00:48,000
+EcoCompute AI. Turning AI from a financial black hole into an optimization engine.
