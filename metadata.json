@@ -1,0 +1,6 @@
+{
+  "name": "EcoCompute AI",
+  "version": "2.1.0",
+  "description": "Green FinOps Infrastructure for Enterprise AI. Uses Gemini 3 to audit code for energy efficiency, cloud cost savings, and compliance.",
+  "requestFramePermissions": []
+}

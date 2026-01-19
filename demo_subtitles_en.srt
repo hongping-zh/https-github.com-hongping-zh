@@ -1,0 +1,27 @@
+1
+00:00:00,000 --> 00:00:02,500
+Welcome to EcoCompute AI. Let's optimize a ResNet block.
+
+2
+00:00:02,500 --> 00:00:05,000
+First, Gemini 3 uses Google Search to find real-time specs for the NVIDIA A100.
+
+3
+00:00:05,000 --> 00:00:08,000
+Next, it enters the Sandbox to mathematically verify arithmetic intensity.
+
+4
+00:00:08,000 --> 00:00:11,500
+Wait! It detected a calculation anomaly. The memory bandwidth assumption was wrong.
+
+5
+00:00:11,500 --> 00:00:14,500
+Watch closely: The Agent self-corrects, switching to FP16 precision automatically.
+
+6
+00:00:14,500 --> 00:00:18,000
+Analysis complete. We saved 62% energy by fusing operators and using quantization.
+
+7
+00:00:18,000 --> 00:00:20,000
+This is Green AI, powered by Gemini 3.
