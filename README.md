@@ -1,3 +1,4 @@
+
 # 🌿 EcoCompute AI: Green FinOps Infrastructure
 
 > **The "Gatekeeper" for Sustainable & Cost-Efficient AI Development**
@@ -11,24 +12,27 @@
 
 ## 🎯 What is EcoCompute AI?
 
-Training a single large language model can emit as much carbon as **5 cars over their entire lifetime**. But for enterprises, the immediate pain is **Cloud Cost**.
+While monitoring tools (like Datadog) only see the **symptoms** of high cloud costs, EcoCompute identifies the **root cause**: inefficient code.
 
-**EcoCompute AI** is a "Green FinOps" infrastructure layer powered by **Gemini 3**. It acts as a virtual Senior Performance Engineer in your CI/CD pipeline that:
-1.  **Prevents Bill Shock**: Blocks code that exceeds compute budgets (FinOps).
+**EcoCompute AI** is a "Green FinOps" infrastructure layer powered by **Gemini 3**. It acts as a predictive Gatekeeper in your CI/CD pipeline that:
+1.  **Prevents Bill Shock**: Intercepts expensive PyTorch models (from **ResNet** to **Llama 3**) before they merge.
 2.  **Ensures Compliance**: Auto-generates audit trails for EU AI Act & SEC Climate Rules.
-3.  **Automates Optimization**: Refactors PyTorch code (Quantization, Fusion) to cut energy & cost by 30-50%.
+3.  **Automates Optimization**: Refactors code (Quantization, Fusion) to cut energy & cost by 30-50%.
 
 ---
 
-## ✨ Key Features (Gemini 3 Powered)
+## ✨ The Hybrid Grounding Engine
 
-| Feature | Tech Stack | Business Value |
-|---------|------------|----------------|
-| **💰 Cost-Aware Routing** | `gemini-flash` (L2) vs `gemini-pro` (L3) | **Unit Economics**: Routes simple tasks to cheap models, complex ones to deep reasoners. |
-| **🔍 Live Hardware Specs** | Google Search Tool | **Accuracy**: Real-time 2026 specs (e.g., B200, TPU v6) vs stale databases. |
-| **⚡ Sandbox Verification** | Python Code Execution | **Trust**: Mathematically proves "Arithmetic Intensity" (FLOPs/Byte). No hallucinations. |
-| **🛡️ Data Moat** | Hybrid AST + GenAI | **IP**: Builds a "Global Efficiency Knowledge Base" of optimal operator patterns. |
-| **🧠 Thinking Budget** | 1024 Tokens | **Depth**: Allocates tokens to plan physics calculations before generating JSON. |
+We de-risk AI optimization by combining four layers of verification to eliminate hallucinations:
+
+| Layer | Technology | Function |
+|-------|------------|----------|
+| **1. Ground Truth** | **Static AST** | Instantly maps code topology as deterministic baseline. |
+| **2. Reasoning** | **Gemini 3 Pro** | Uses a **1024-token thinkingBudget** to plan audits like a Senior Engineer. |
+| **3. Live Data** | **Google Search** | Fetches real-time 2026 hardware specs (e.g., **NVIDIA B200** pricing). |
+| **4. Verification** | **Code Sandbox** | Forces the agent to write Python to mathematically verify FLOPs/Byte. |
+
+> **Scientific Calibration:** We calibrate our physics engine on MLPerf baselines (ResNet-50) to ensure <1% error margins before analyzing bleeding-edge GenAI models like **Llama 3**.
 
 ---
 
@@ -56,7 +60,7 @@ graph TD
 ### 📱 Enterprise Deployment (Simulated)
 
 1. **Configure Policy**: Set max budget (e.g., "$500/month increase").
-2. **Run Audit**: Paste PyTorch code or upload an architecture diagram.
+2. **Run Audit**: Paste PyTorch code (e.g. Llama 3 GQA) or upload an architecture diagram.
 3. **View Report**: See projected Dollar Savings and Carbon Reduction.
 
 **Note on API Keys:** 

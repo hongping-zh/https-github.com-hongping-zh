@@ -1,5 +1,6 @@
+
 import React from 'react';
-import { X, Cpu, Zap, Search, Code2, Database, Map, Video, Layout } from 'lucide-react';
+import { X, Cpu, Zap, Search, Code2, Database, Map, Video, Layout, Scale } from 'lucide-react';
 
 interface Props {
   isOpen: boolean;
@@ -26,11 +27,27 @@ export const HelpModal: React.FC<Props> = ({ isOpen, onClose }) => {
             </div>
             <div>
               <h2 className="text-2xl font-bold text-white">Project Documentation</h2>
-              <p className="text-eco-400 font-mono text-sm">v2.0.0 (Hackathon Edition - Future Proof 2026)</p>
+              <p className="text-eco-400 font-mono text-sm">v2.1.0 (Hackathon Edition - Future Proof 2026)</p>
             </div>
           </div>
 
           <div className="space-y-8 text-gray-300">
+            <section className="bg-blue-900/10 border border-blue-500/20 p-4 rounded-xl">
+               <h3 className="flex items-center gap-2 text-lg font-semibold text-blue-200 mb-2">
+                 <Scale className="w-5 h-5" />
+                 Methodology: The "Calibration Baseline"
+               </h3>
+               <p className="text-sm leading-relaxed mb-3">
+                 <strong>Why do we demo with ResNet-50?</strong>
+               </p>
+               <p className="text-sm text-gray-400 italic mb-3">
+                 "Just as a thermometer needs ice water (0°C) to calibrate, EcoCompute uses the vast amount of public MLPerf data on ResNet-50 to calibrate our physics engine."
+               </p>
+               <p className="text-sm text-gray-400">
+                 Once we prove our math is accurate on this "Gold Standard" baseline, the same engine is applied to optimize bleeding-edge architectures like <strong>Llama 3</strong> and <strong>Mistral</strong>.
+               </p>
+            </section>
+
             <section>
               <h3 className="flex items-center gap-2 text-lg font-semibold text-white mb-3">
                 <Cpu className="w-5 h-5 text-blue-400" />
