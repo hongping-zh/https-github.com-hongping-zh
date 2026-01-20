@@ -1,27 +1,40 @@
+
 1
-00:00:00,000 --> 00:00:02,500
-Welcome to EcoCompute AI. Let's optimize a ResNet block.
+00:00:00,000 --> 00:00:04,500
+Training AI isn't just an environmental crisis—it's a financial one.
 
 2
-00:00:02,500 --> 00:00:05,000
-First, Gemini 3 uses Google Search to find real-time specs for the NVIDIA A100.
+00:00:04,500 --> 00:00:09,000
+Cloud bills are exploding, and monitoring tools only show symptoms, not root causes.
 
 3
-00:00:05,000 --> 00:00:08,000
-Next, it enters the Sandbox to mathematically verify arithmetic intensity.
+00:00:09,000 --> 00:00:14,000
+Meet EcoCompute AI. The "Green FinOps" infrastructure that stops bill shock at the source.
 
 4
-00:00:08,000 --> 00:00:11,500
-Wait! It detected a calculation anomaly. The memory bandwidth assumption was wrong.
+00:00:14,000 --> 00:00:19,000
+Acting as a Gatekeeper in your CI/CD pipeline, we intercept inefficient code before it merges.
 
 5
-00:00:11,500 --> 00:00:14,500
-Watch closely: The Agent self-corrects, switching to FP16 precision automatically.
+00:00:19,000 --> 00:00:23,000
+Let's audit a Llama 3 Attention block targeting the new NVIDIA B200.
 
 6
-00:00:14,500 --> 00:00:18,000
-Analysis complete. We saved 62% energy by fusing operators and using quantization.
+00:00:23,000 --> 00:00:28,000
+Powered by Gemini 3, we use Google Search to fetch real-time 2026 hardware specs.
 
 7
-00:00:18,000 --> 00:00:20,000
-This is Green AI, powered by Gemini 3.
+00:00:28,000 --> 00:00:33,000
+But here's the magic. We force the Agent to use a Python Sandbox to verify its math.
+
+8
+00:00:33,000 --> 00:00:38,500
+Watch this: It detected an anomaly, self-corrected its assumptions, and re-ran the calculation.
+
+9
+00:00:38,500 --> 00:00:44,000
+The result? It proves that optimizing this block saves $42 per million inferences.
+
+10
+00:00:44,000 --> 00:00:48,000
+EcoCompute AI. Turning AI from a financial black hole into an optimization engine.

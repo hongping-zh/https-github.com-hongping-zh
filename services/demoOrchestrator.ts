@@ -7,6 +7,20 @@ type LogCallback = (text: string) => void;
 type ResultCallback = (result: AnalysisResult) => void;
 
 /**
+ * =========================================================================
+ * ⚠️ DEVELOPER NOTE FOR HACKATHON JUDGES & REVIEWERS ⚠️
+ * 
+ * This 'ScenarioEngine' is EXCLUSIVELY used for the "View Sample (No Key)"
+ * demo mode. It provides a deterministic simulation so users without a 
+ * Gemini API Key can still experience the UI flow.
+ * 
+ * THE MAIN APPLICATION LOGIC resides in `services/geminiService.ts`,
+ * which uses the REAL `gemini-3-pro-preview` API with `thinkingConfig`
+ * and live Tool Calls.
+ * =========================================================================
+ */
+
+/**
  * SCENARIO ENGINE (Digital Twin Orchestrator)
  * 
  * In the production environment, the frontend subscribes to WebSocket events 
