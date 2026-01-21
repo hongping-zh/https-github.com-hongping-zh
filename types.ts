@@ -100,6 +100,13 @@ export interface DataFlywheelStage {
   description: string;
 }
 
+// V38 Chat Types
+export interface ChatMessage {
+  role: 'user' | 'model';
+  text: string;
+  timestamp: number;
+}
+
 export const EXAMPLES: Record<string, string> = {
   'Llama 3 Attention (GQA)': `import torch
 import torch.nn as nn

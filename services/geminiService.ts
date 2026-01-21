@@ -1,6 +1,6 @@
 
-import { GoogleGenAI, Type, FunctionDeclaration, Tool, FunctionCallPart, FunctionResponsePart } from "@google/genai";
-import { AnalysisResult, HardwareProfile } from "../types";
+import { GoogleGenAI, Type, FunctionDeclaration, Tool, FunctionCallPart, FunctionResponsePart, Chat } from "@google/genai";
+import { AnalysisResult, HardwareProfile, ChatMessage } from "../types";
 import { analyzeCodeStatic } from "./staticAnalyzer";
 
 // Region Carbon Intensity Map (Duplicated from HardwareSelector to avoid circular deps/React imports)
@@ -77,6 +77,123 @@ async function processImageForGemini(dataUrl: string): Promise<string> {
     img.src = dataUrl;
   });
 }
+
+/**
+ * V38 Wisdom Pilot Chat Service
+ * Provides expert consultation on the "EcoCompute V38" methodology.
+ */
+export const sendV38Message = async (
+  apiKey: string,
+  history: ChatMessage[],
+  newMessage: string,
+  onChunk: (text: string) => void
+): Promise<string> => {
+  if (!apiKey) throw new GeminiError("API Key required.");
+
+  const ai = new GoogleGenAI({ apiKey: apiKey });
+
+  // V38 Knowledge Base Injection
+  const systemInstruction = `
+    You are the **V38 Wisdom Pilot**, the lead architect and consultant for EcoCompute AI (Version 38).
+    
+    ## YOUR MISSION
+    Your goal is to educate users on the **"Green FinOps" philosophy** and sell the "V38 Knowledge Experience".
+    You are not just a chatbot; you are a high-level consultant helping Engineering Directors and CFOs understand WHY they need this infrastructure.
+
+    ## THE V38 METHODOLOGY (Your Knowledge Base)
+    1. **The Problem**: "Cloud Bill Shock". Training AI emits carbon (5 cars worth), but the real pain is financial. Datadog sees symptoms (CPU spikes); we see root causes (inefficient code).
+    2. **The Solution**: "The Gatekeeper". A CI/CD infrastructure that intercepts code *before* merge.
+    3. **The Architecture (Hybrid Grounding)**:
+       - **L1 Static Gate**: Regex/AST scanning (Free, Fast).
+       - **L2 Flash Router**: Gemini Flash-Lite for docs/simple fixes.
+       - **L3 Deep Reasoning**: Gemini 3 Pro for architecture changes ($$$ value).
+    4. **The "Data Moat"**: We collect data on "Which Code + Which Hardware = Max Efficiency".
+    5. **Scientific Rigor**: We use "Calibration Baselines" (ResNet-50) and "Python Sandboxes" to verify physics math. No hallucinations.
+
+    ## TONE & STYLE
+    - **Professional & Insightful**: Speak like a CTO or Senior Principal Engineer.
+    - **Persuasive**: Highlight ROI (Return on Investment). "We save you 30% on GPU bills."
+    - **Concise**: Don't lecture. Engage.
+    
+    ## FORMATTING
+    - Use Markdown for emphasis (**Bold**, *Italic*, \`Code\`).
+    - If asked about "Pricing", mention the "Growth Tier" ($299/mo) and "Enterprise Air-Gap".
+    - If asked about technical details, explain the "Tiered Architecture".
+  `;
+
+  // 1. Remove initial 'model' message (API requires User turn first)
+  const strippedHistory = history.filter((msg, index) => {
+    if (index === 0 && msg.role === 'model') return false;
+    return true;
+  });
+
+  // 2. Sanitize: Merge consecutive turns of the same role (API requirement)
+  // This prevents [User, User] errors if the UI sends mixed state.
+  const sanitizedHistory: ChatMessage[] = [];
+  for (const msg of strippedHistory) {
+      if (sanitizedHistory.length > 0) {
+          const last = sanitizedHistory[sanitizedHistory.length - 1];
+          if (last.role === msg.role) {
+              // Merge text
+              last.text += "\n\n" + msg.text;
+          } else {
+              sanitizedHistory.push({ ...msg });
+          }
+      } else {
+          sanitizedHistory.push({ ...msg });
+      }
+  }
+
+  // 3. Convert to Content objects
+  const contents = sanitizedHistory.map(msg => ({
+    role: msg.role === 'model' ? 'model' : 'user',
+    parts: [{ text: msg.text }]
+  }));
+
+  // 4. Append the new message
+  // If the last message was also from User, append to it instead of creating a new turn.
+  if (contents.length > 0 && contents[contents.length - 1].role === 'user') {
+      contents[contents.length - 1].parts[0].text += "\n\n" + newMessage;
+  } else {
+      contents.push({
+        role: 'user',
+        parts: [{ text: newMessage }]
+      });
+  }
+
+  return retryOperation(async () => {
+    try {
+      const result = await ai.models.generateContentStream({
+        model: "gemini-3-flash-preview",
+        contents: contents,
+        config: { systemInstruction }
+      });
+      
+      let fullResponse = "";
+      for await (const chunk of result) {
+        const text = chunk.text || "";
+        fullResponse += text;
+        onChunk(text);
+      }
+      return fullResponse;
+
+    } catch (error: any) {
+      console.error("V38 Chat Error:", error);
+      let errorMsg = error.message || "Unknown Error";
+      // Try to extract readable error from JSON string if present
+      try {
+        if (errorMsg.includes("{")) {
+          const parsed = JSON.parse(errorMsg.substring(errorMsg.indexOf("{")));
+          if (parsed.error && parsed.error.message) {
+            errorMsg = parsed.error.message;
+          }
+        }
+      } catch (e) { /* ignore */ }
+      
+      throw new GeminiError(errorMsg);
+    }
+  });
+};
 
 /**
  * Main Analysis Function (Production Path)

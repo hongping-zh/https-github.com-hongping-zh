@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { HardwareSelector, hardwareOptions } from './components/HardwareSelector';
 import { CodeBlock } from './components/CodeBlock';
@@ -11,6 +12,7 @@ import { ApiKeyModal } from './components/ApiKeyModal';
 import { CiCdSimulator } from './components/CiCdSimulator'; 
 import { CalibrationPanel } from './components/CalibrationPanel'; 
 import { DeployModal } from './components/DeployModal'; 
+import { V38ChatModal } from './components/V38ChatModal';
 import { Toast, ToastType } from './components/Toast';
 import { analyzeAndOptimizeStream, GeminiError } from './services/geminiService';
 import { moatService } from './services/moatService';
@@ -18,7 +20,7 @@ import { demoOrchestrator } from './services/demoOrchestrator'; // Clean Import
 import { MOCK_ANALYSIS_RESULT } from './services/mockData';
 import { HardwareProfile, AnalysisResult, INITIAL_CODE, EXAMPLES, DEMO_SKETCH } from './types';
 import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip, Legend } from 'recharts';
-import { Leaf, Cpu, Zap, ArrowRight, Activity, Info, Database, Lightbulb, AlertTriangle, CheckCircle2, HelpCircle, ShieldCheck, Share2, Lock, EyeOff, BookOpen, ChevronDown, BrainCircuit, Search, Server, FileText, Bug, Settings, Download, DollarSign, PlayCircle, Link as LinkIcon, Maximize2, GitMerge, Rocket, Scale } from 'lucide-react';
+import { Leaf, Cpu, Zap, ArrowRight, Activity, Info, Database, Lightbulb, AlertTriangle, CheckCircle2, HelpCircle, ShieldCheck, Share2, Lock, EyeOff, BookOpen, ChevronDown, BrainCircuit, Search, Server, FileText, Bug, Settings, Download, DollarSign, PlayCircle, Link as LinkIcon, Maximize2, GitMerge, Rocket, Scale, Sparkles } from 'lucide-react';
 
 export default function App() {
   const [code, setCode] = useState(INITIAL_CODE);
@@ -44,6 +46,8 @@ export default function App() {
   const [showDeployModal, setShowDeployModal] = useState(false);
   // New: Calibration State
   const [isCalibrated, setIsCalibrated] = useState(false);
+  // New: V38 Chat State
+  const [showV38Chat, setShowV38Chat] = useState(false);
 
   // UI State
   const [showHelp, setShowHelp] = useState(false);
@@ -351,6 +355,11 @@ ${result.recommendations.map(r => `- [${r.category}] **${r.title}**: ${r.reasoni
         isOpen={showDeployModal}
         onClose={() => setShowDeployModal(false)}
       />
+      <V38ChatModal
+        isOpen={showV38Chat}
+        onClose={() => setShowV38Chat(false)}
+        apiKey={apiKey}
+      />
       <ApiKeyModal 
         isOpen={showKeyModal} 
         onSave={handleSaveKey} 
@@ -376,20 +385,20 @@ ${result.recommendations.map(r => `- [${r.category}] **${r.title}**: ${r.reasoni
           <div className="flex items-center gap-4">
              <div className="hidden md:flex items-center gap-2 mr-4 border-r border-gray-800 pr-4">
                 <button 
+                  onClick={() => setShowV38Chat(true)}
+                  className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-gradient-to-r from-indigo-500/20 to-purple-500/20 border border-indigo-500/30 hover:border-indigo-400 text-indigo-300 hover:text-white text-xs font-bold transition-all group animate-in slide-in-from-top-2"
+                  title="Ask the V38 Wisdom Pilot"
+                >
+                   <Sparkles className="w-3.5 h-3.5 group-hover:text-yellow-300" />
+                   <span>V38 Wisdom Pilot</span>
+                </button>
+                <button 
                   onClick={() => setShowCiCdSim(true)}
                   className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-gray-800/50 border border-gray-700 hover:border-eco-500/50 hover:bg-gray-800 text-gray-400 hover:text-white text-xs font-medium transition-all group"
                   title="Simulate CI/CD Pipeline Integration"
                 >
                    <GitMerge className="w-3.5 h-3.5 group-hover:text-eco-400" />
                    <span>CI/CD Gate</span>
-                </button>
-                <button 
-                  onClick={() => setShowDeployModal(true)}
-                  className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-purple-500/10 border border-purple-500/20 hover:bg-purple-500/20 text-purple-400 hover:text-purple-300 text-xs font-medium transition-all group"
-                  title="Enterprise Deployment Options"
-                >
-                   <Rocket className="w-3.5 h-3.5" />
-                   <span>Deploy</span>
                 </button>
              </div>
 
