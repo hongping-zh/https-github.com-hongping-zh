@@ -53,6 +53,86 @@ const incrementUsage = (): number => {
   return usage.count;
 };
 
+// Demo Mode: Pre-defined responses for users without API Key
+const DEMO_RESPONSES: Record<string, string> = {
+  'default': `Great question! Let me explain the **V38 methodology**.
+
+**The Core Problem**: Your engineers write PyTorch code that costs 30% more than it should. Monitoring tools like Datadog see the *symptoms* (high GPU usage), but we see the *root cause* (inefficient code).
+
+**Our Solution**: A CI/CD Gatekeeper that intercepts expensive code *before* it merges.
+
+**The Architecture**:
+- **L1 Static Gate**: Free regex/AST scanning (catches 80% of issues)
+- **L2 Flash Router**: Gemini Flash for simple fixes
+- **L3 Deep Reasoning**: Gemini 3 Pro for complex architecture changes
+
+Would you like to know more about our **ROI model** or **technical implementation**?`,
+  
+  'roi': `**ROI Analysis for V38**
+
+Typical enterprise results:
+- **30-50% reduction** in GPU cloud costs
+- **$50K-200K/year** savings for mid-size AI teams
+- **2-week payback period** on Growth tier ($299/mo)
+
+**How we calculate savings**:
+1. Scan your codebase for inefficiency patterns
+2. Estimate FLOPs reduction from optimizations
+3. Map to real cloud pricing (H100: $3.50/hr, B200: $5.00/hr)
+
+The key insight: **1% efficiency improvement = 1% cost reduction**, compounded across millions of inferences.`,
+  
+  'architecture': `**V38 Hybrid Grounding Architecture**
+
+We de-risk AI optimization with 4 verification layers:
+
+1. **Static AST Analysis** (Deterministic)
+   - Instant code topology mapping
+   - Zero hallucination baseline
+
+2. **Gemini 3 Reasoning** (1024-token thinking budget)
+   - Plans audit strategy like a Senior Engineer
+   - Cross-references physics equations
+
+3. **Google Search Grounding** (Real-time)
+   - 2026 hardware specs (B200, Edge TPU)
+   - Live cloud pricing from AWS/GCP/Azure
+
+4. **Code Execution Sandbox** (Math Verification)
+   - Forces LLM to write Python to verify FLOPs
+   - Eliminates arithmetic hallucinations
+
+This is why we can provide **Error Bars** and **Confidence Scores** - we don't guess, we verify.`,
+  
+  'pricing': `**V38 Pricing Tiers**
+
+| Tier | Price | Features |
+|------|-------|----------|
+| **Starter** | $49/mo | Basic code audits, 100 scans/mo |
+| **Growth** | $299/mo | CI/CD Gatekeeper, FinOps Dashboard, Team Collaboration |
+| **Enterprise** | Custom | Air-gapped deployment, Custom compliance reports, SLA |
+
+**Why Growth is our most popular tier**:
+- Pays for itself if you save just 2 GPU-hours/month
+- Most teams see 10-20x ROI
+
+Interested in a pilot program? Contact us at hello@ecocompute.ai`
+};
+
+const getDemoResponse = (userMessage: string): string => {
+  const lowerMsg = userMessage.toLowerCase();
+  if (lowerMsg.includes('roi') || lowerMsg.includes('cost') || lowerMsg.includes('save') || lowerMsg.includes('money') || lowerMsg.includes('价') || lowerMsg.includes('省')) {
+    return DEMO_RESPONSES['roi'];
+  }
+  if (lowerMsg.includes('architect') || lowerMsg.includes('technical') || lowerMsg.includes('how') || lowerMsg.includes('work') || lowerMsg.includes('技术') || lowerMsg.includes('架构')) {
+    return DEMO_RESPONSES['architecture'];
+  }
+  if (lowerMsg.includes('price') || lowerMsg.includes('pricing') || lowerMsg.includes('tier') || lowerMsg.includes('plan') || lowerMsg.includes('定价')) {
+    return DEMO_RESPONSES['pricing'];
+  }
+  return DEMO_RESPONSES['default'];
+};
+
 export const V38ChatModal: React.FC<Props> = ({ isOpen, onClose, apiKey }) => {
   const [messages, setMessages] = useState<ChatMessage[]>(INITIAL_MESSAGES);
   const [inputText, setInputText] = useState('');
@@ -71,11 +151,7 @@ export const V38ChatModal: React.FC<Props> = ({ isOpen, onClose, apiKey }) => {
 
   const handleSend = async () => {
     if (!inputText.trim()) return;
-    if (!apiKey) {
-      setMessages(prev => [...prev, { role: 'model', text: "Please configure your Gemini API Key in the settings first to consult the V38 Pilot.", timestamp: Date.now() }]);
-      return;
-    }
-
+    
     // Check daily limit
     if (isLimitReached) {
       setMessages(prev => [...prev, { 
@@ -92,8 +168,34 @@ export const V38ChatModal: React.FC<Props> = ({ isOpen, onClose, apiKey }) => {
 
     const userMsg: ChatMessage = { role: 'user', text: inputText, timestamp: Date.now() };
     setMessages(prev => [...prev, userMsg]);
+    const currentInput = inputText;
     setInputText('');
     setIsLoading(true);
+
+    // Demo Mode: If no API Key, use pre-defined responses
+    if (!apiKey) {
+      // Simulate typing delay for realism
+      await new Promise(resolve => setTimeout(resolve, 800));
+      const demoResponse = getDemoResponse(currentInput);
+      
+      // Simulate streaming effect
+      const words = demoResponse.split(' ');
+      let accumulated = '';
+      setMessages(prev => [...prev, { role: 'model', text: '', timestamp: Date.now() }]);
+      
+      for (let i = 0; i < words.length; i++) {
+        accumulated += (i === 0 ? '' : ' ') + words[i];
+        setMessages(prev => {
+          const newHistory = [...prev];
+          newHistory[newHistory.length - 1].text = accumulated;
+          return [...newHistory];
+        });
+        await new Promise(resolve => setTimeout(resolve, 20));
+      }
+      
+      setIsLoading(false);
+      return;
+    }
 
     try {
       // Create a temporary model message for streaming
