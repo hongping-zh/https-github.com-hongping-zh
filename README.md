@@ -140,9 +140,9 @@ jobs:
 
 We are a **Calm, Open Source** company.
 
-- 🐛 Found a bug? [Open an Issue](https://github.com/hongping-zh/https-github.com-hongping-zh/issues)
-- 💡 Feature request? [Start a Discussion](https://github.com/hongping-zh/https-github.com-hongping-zh/discussions)
-- 🙋 Want to contribute? Check out [`good first issue`](https://github.com/hongping-zh/https-github.com-hongping-zh/labels/good%20first%20issue)
+- 🐛 Found a bug? [Open an Issue](https://github.com/hongping-zh/ecocompute-ai/issues)
+- 💡 Feature request? [Start a Discussion](https://github.com/hongping-zh/ecocompute-ai/discussions)
+- 🙋 Want to contribute? Check out [`good first issue`](https://github.com/hongping-zh/ecocompute-ai/labels/good%20first%20issue)
 
 ---
 
@@ -156,6 +156,6 @@ We are a **Calm, Open Source** company.
   <b>Built with 💚 for a sustainable AI future</b>
   <br><br>
   <a href="https://ecocompute-ai-d8zeusq2ti.edgeone.dev/">Live Demo</a> •
-  <a href="https://github.com/hongping-zh/https-github.com-hongping-zh/issues">Issues</a> •
+  <a href="https://github.com/hongping-zh/ecocompute-ai/issues">Issues</a> •
   <a href="mailto:zhanghongping1982@gmail.com">Contact</a>
 </p>
