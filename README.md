@@ -8,7 +8,7 @@
 [![Carbon Saved](https://img.shields.io/badge/Carbon%20Saved-2.4%20tons%20CO₂e-brightgreen.svg)]()
 [![Live Demo](https://img.shields.io/badge/Demo-Try%20Now-orange)](https://ecocompute-ai-d8zeusq2ti.edgeone.dev/)
 
-> "We don't just monitor cloud costs. We **prevent** them."
+> "EcoCompute-AI maximizes the potential of your hardware. By implementing advanced resource scheduling and quantization algorithms, our solution enables faster inference for LLMs and Deep Learning models. We focus on sustainable computing to improve energy efficiency and significantly reduce cost by optimizing GPU utilization."
 
 ---
 
