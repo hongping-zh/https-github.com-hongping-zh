@@ -593,13 +593,23 @@ ${result.recommendations.map(r => `- [${r.category}] **${r.title}**: ${r.reasoni
                 </button>
                 
                 {!isAnalyzing && !result && (
-                    <button 
-                       onClick={() => handleViewSample(false)}
-                       className="text-xs text-gray-500 hover:text-eco-400 flex items-center justify-center gap-1 transition-colors py-1"
-                    >
-                        <PlayCircle className="w-3 h-3" />
-                        No Key? Try Read-Only Demo Mode
-                    </button>
+                    <div className="flex flex-col gap-1 items-center">
+                        <button 
+                           onClick={() => handleViewSample(false)}
+                           className="text-xs text-gray-500 hover:text-eco-400 flex items-center justify-center gap-1 transition-colors py-1 w-full"
+                        >
+                            <PlayCircle className="w-3 h-3" />
+                            No Key? Try Read-Only Demo Mode
+                        </button>
+                        
+                        <button 
+                           onClick={() => setShowAgentModal(true)}
+                           className="text-xs text-blue-500/70 hover:text-blue-400 flex items-center justify-center gap-1.5 transition-colors py-1 w-full border-t border-gray-800/50 pt-2 mt-1"
+                        >
+                            <Bot className="w-3 h-3" />
+                            New: Agent Token FinOps Simulator
+                        </button>
+                    </div>
                 )}
             </div>
           </div>
