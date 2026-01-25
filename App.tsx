@@ -592,25 +592,25 @@ ${result.recommendations.map(r => `- [${r.category}] **${r.title}**: ${r.reasoni
                 </div>
                 </button>
                 
-                {!isAnalyzing && !result && (
-                    <div className="flex flex-col gap-1 items-center">
-                        <button 
+                <div className="flex flex-col gap-2">
+                    {!isAnalyzing && !result && (
+                         <button 
                            onClick={() => handleViewSample(false)}
                            className="text-xs text-gray-500 hover:text-eco-400 flex items-center justify-center gap-1 transition-colors py-1 w-full"
                         >
                             <PlayCircle className="w-3 h-3" />
                             No Key? Try Read-Only Demo Mode
                         </button>
-                        
-                        <button 
-                           onClick={() => setShowAgentModal(true)}
-                           className="text-xs text-blue-500/70 hover:text-blue-400 flex items-center justify-center gap-1.5 transition-colors py-1 w-full border-t border-gray-800/50 pt-2 mt-1"
-                        >
-                            <Bot className="w-3 h-3" />
-                            New: Agent Token FinOps Simulator
-                        </button>
-                    </div>
-                )}
+                    )}
+                    
+                    <button 
+                       onClick={() => setShowAgentModal(true)}
+                       className={`mt-1 w-full flex items-center justify-center gap-2 px-4 py-2.5 bg-gradient-to-r from-blue-500/10 to-indigo-500/10 hover:from-blue-500/20 hover:to-indigo-500/20 border border-blue-500/30 hover:border-blue-400 text-blue-300 hover:text-white rounded-xl text-sm font-bold transition-all shadow-[0_0_15px_rgba(59,130,246,0.1)] hover:shadow-[0_0_20px_rgba(59,130,246,0.2)] ${isAnalyzing ? 'opacity-50 pointer-events-none' : ''}`}
+                    >
+                        <Bot className="w-4 h-4" />
+                        Launch Agent FinOps Simulator
+                    </button>
+                </div>
             </div>
           </div>
 
