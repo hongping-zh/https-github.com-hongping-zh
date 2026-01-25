@@ -164,8 +164,13 @@ class Bottleneck(nn.Module):
     Used as the 'Calibration Baseline' for EcoCompute's physics engine.
     """
     expansion = 4
-    def __init__(self, inplanes, planes, stride=1):
+    
+    def __init__(self, inplanes=64, planes=64, stride=1, downsample=None):
         super(Bottleneck, self).__init__()
+        # Store parameters as instance variables
+        self.stride = stride
+        self.downsample = downsample
+        
         # 1x1 conv - High memory access relative to compute
         self.conv1 = nn.Conv2d(inplanes, planes, kernel_size=1, bias=False)
         self.bn1 = nn.BatchNorm2d(planes)
@@ -176,23 +181,31 @@ class Bottleneck(nn.Module):
         self.conv3 = nn.Conv2d(planes, planes * self.expansion, kernel_size=1, bias=False)
         self.bn3 = nn.BatchNorm2d(planes * self.expansion)
         self.relu = nn.ReLU(inplace=True)
+        
+        # Create downsample layer if dimensions don't match
+        if inplanes != planes * self.expansion or stride != 1:
+            self.downsample = nn.Sequential(
+                nn.Conv2d(inplanes, planes * self.expansion, kernel_size=1, stride=stride, bias=False),
+                nn.BatchNorm2d(planes * self.expansion),
+            )
 
     def forward(self, x):
         identity = x
+        
         out = self.conv1(x)
         out = self.bn1(out)
         out = self.relu(out)
+        
         out = self.conv2(out)
         out = self.bn2(out)
         out = self.relu(out)
+        
         out = self.conv3(out)
         out = self.bn3(out)
         
-        if stride != 1 or inplanes != planes * self.expansion:
-             identity = nn.Sequential(
-                nn.Conv2d(inplanes, planes * self.expansion, kernel_size=1, stride=stride, bias=False),
-                nn.BatchNorm2d(planes * self.expansion),
-             )(x)
+        # Apply downsample if needed
+        if self.downsample is not None:
+            identity = self.downsample(x)
 
         out += identity
         out = self.relu(out)
