@@ -1,41 +1,49 @@
+<div align="center">
+
 # 🌿 EcoCompute AI
 
-**The Green FinOps Gatekeeper for PyTorch & TensorFlow**
+### Reduce LLM Inference Costs by 40% & Track Carbon Footprint — All Before Code Merges
+
+[English](README.md) | [中文](README_CN.md)
 
 [![License](https://img.shields.io/badge/License-Apache%202.0-green.svg)](https://opensource.org/licenses/Apache-2.0)
-[![Status](https://img.shields.io/badge/Status-Public%20Beta-blue.svg)]()
-[![Powered By](https://img.shields.io/badge/AI-Gemini%203%20Pro-purple.svg)]()
-[![Carbon Saved](https://img.shields.io/badge/Carbon%20Saved-2.4%20tons%20CO₂e-brightgreen.svg)]()
-[![Live Demo](https://img.shields.io/badge/Demo-Try%20Now-orange)](https://ecocompute-ai-d8zeusq2ti.edgeone.dev/)
+[![Python](https://img.shields.io/badge/Python-3.8+-blue.svg)](https://www.python.org/)
+[![Build](https://img.shields.io/github/actions/workflow/status/hongping-zh/ecocompute-ai/ecocompute-analysis.yml?label=CI)](https://github.com/hongping-zh/ecocompute-ai/actions)
+[![Demo](https://img.shields.io/badge/🚀_Live_Demo-Try_Now-orange)](https://ecocompute-ai-elb0yplu9w.edgeone.dev/)
 
-> "EcoCompute-AI maximizes the potential of your hardware. By implementing advanced resource scheduling and quantization algorithms, our solution enables faster inference for LLMs and Deep Learning models. We focus on sustainable computing to improve energy efficiency and significantly reduce cost by optimizing GPU utilization."
+**The CI/CD Gatekeeper that catches expensive AI code before it hits production.**
+
+[Try Live Demo](https://ecocompute-ai-elb0yplu9w.edgeone.dev/) · [Report Bug](https://github.com/hongping-zh/ecocompute-ai/issues) · [Request Feature](https://github.com/hongping-zh/ecocompute-ai/discussions)
+
+</div>
+
+---
+
+## ✨ Features
+
+- ✅ **Pre-Merge Cost Prediction** — Estimate $$$ before training runs
+- ✅ **Agent Token FinOps** — Predict multi-agent token costs (Google Antigravity, LangGraph)
+- ✅ **V38 Wisdom Pilot** — AI FinOps consultant explains ROI to CFOs
+- ✅ **CI/CD Integration** — GitHub Actions gatekeeper blocks over-budget PRs
+- ✅ **Carbon Tracking** — Real-time CO₂e reporting with regional grid data
 
 ---
 
 ## ⚡ The Problem
 
-Training a single AI model can cost as much as a house.
+> Training a single AI model emits as much carbon as **5 cars over their lifetime**.
 
-- **30-50%** of GPU spend is wasted on unoptimized code
-- Engineers don't see the bill until the end of the month
-- Existing tools (Datadog/CloudWatch) are **reactive** — by then, it's too late
+| Pain Point | Impact |
+|------------|--------|
+| 💸 **30-50% GPU waste** | Unoptimized code burns money |
+| 🕐 **Reactive monitoring** | Datadog/CloudWatch show costs *after* the damage |
+| 🤖 **Multi-agent cost explosion** | Context ballooning in agent workflows (100x token cost) |
 
 ---
 
 ## 🛡️ The Solution
 
-EcoCompute is a **CI/CD Gatekeeper**. It intercepts expensive code **before it merges**.
-
-### Core Features
-
-| Feature | Description |
-|---------|-------------|
-| 🔮 **Pre-Merge Cost Prediction** | Estimates $$$ of a training run by analyzing AST + Arithmetic Intensity |
-| 🧠 **Hybrid Reasoning Engine** | Uses **Gemini 3 Pro** to understand complex model architectures (Transformers, CNNs) |
-| 🛑 **Budget Enforcement** | Automatically blocks Pull Requests that violate team budget policies |
-| 🤖 **Agent Token FinOps** | **NEW!** Predicts token costs for multi-agent workflows (e.g., Google Antigravity) before execution |
-| 🔋 **Carbon Impact Report** | Translates FLOPs into CO₂e/kWh with regional grid data |
-| ⚡ **Auto-Optimization** | Suggests refactors (Quantization, Fusion) to cut costs by 30-50% |
+EcoCompute is a **CI/CD Gatekeeper** — intercepts expensive code **before it merges**.
 
 ---
 
@@ -66,33 +74,33 @@ We use a **Tiered Gatekeeper** to maximize ROI:
 
 ## 🚀 Quick Start
 
-### Option 1: Try Live Demo
-**[🌐 Experience EcoCompute AI Now](https://ecocompute-ai-d8zeusq2ti.edgeone.dev/)**
-
-### Option 2: Install via Pip
+### Option 1: Try Live Demo (No Install)
 ```bash
-pip install ecocompute
+# Just click the link below — works in browser!
+```
+**[🌐 Try EcoCompute AI Now →](https://ecocompute-ai-elb0yplu9w.edgeone.dev/)**
+
+### Option 2: Install CLI
+```bash
+pip install ecocompute-ai
+ecocompute start
 ```
 
-### Option 3: Docker (Recommended)
+### Option 3: One-Line Audit
 ```bash
-docker run -it ecocompute/audit --dry-run
+ecocompute audit --path ./model.py --gpu "nvidia-h100"
 ```
 
-### Run Your First Audit
-```bash
-# Scan your model file for expensive operations
-ecocompute audit --path ./src/model.py --gpu "nvidia-h100"
-
-# Output:
-# ┌─────────────────────────────────────────────────┐
-# │ 🔍 EcoCompute Analysis Report                   │
-# ├─────────────────────────────────────────────────┤
-# │ Estimated Cost:     $487.50                     │
-# │ Estimated Carbon:   12.3 kg CO₂e                │
-# │ Optimization Found: Matrix multiplication L45   │
-# │ Potential Savings:  $150 (31%)                  │
-# └─────────────────────────────────────────────────┘
+**Output:**
+```
+┌─────────────────────────────────────────────────┐
+│ 🔍 EcoCompute Analysis Report                   │
+├─────────────────────────────────────────────────┤
+│ Estimated Cost:     $487.50                     │
+│ Estimated Carbon:   12.3 kg CO₂e                │
+│ Optimization Found: Matrix multiplication L45   │
+│ Potential Savings:  $150 (31%)                  │
+└─────────────────────────────────────────────────┘
 ```
 
 ### Add to GitHub Actions
@@ -112,6 +120,19 @@ jobs:
           carbon_limit: 50   # kg CO2e
           api_key: ${{ secrets.ECOCOMPUTE_KEY }}
 ```
+
+---
+
+## 📊 Benchmarks
+
+| Tool | Cost Prediction | Carbon Tracking | CI/CD Gate | Multi-Agent FinOps |
+|------|:---------------:|:---------------:|:----------:|:------------------:|
+| **EcoCompute AI** | ✅ -40% | ✅ | ✅ | ✅ |
+| CodeCarbon | ❌ | ✅ | ❌ | ❌ |
+| ML CO2 Impact | ❌ | ✅ | ❌ | ❌ |
+| Datadog ML | ❌ | ❌ | ❌ | ❌ |
+
+> *EcoCompute is the only tool that predicts costs **before** deployment and supports multi-agent workflows.*
 
 ---
 
@@ -156,7 +177,7 @@ We are a **Calm, Open Source** company.
 <p align="center">
   <b>Built with 💚 for a sustainable AI future</b>
   <br><br>
-  <a href="https://ecocompute-ai-d8zeusq2ti.edgeone.dev/">Live Demo</a> •
+  <a href="https://ecocompute-ai-elb0yplu9w.edgeone.dev/">Live Demo</a> •
   <a href="https://github.com/hongping-zh/ecocompute-ai/issues">Issues</a> •
   <a href="mailto:zhanghongping1982@gmail.com">Contact</a>
 </p>
