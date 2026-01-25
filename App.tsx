@@ -13,6 +13,7 @@ import { CiCdSimulator } from './components/CiCdSimulator';
 import { CalibrationPanel } from './components/CalibrationPanel'; 
 import { DeployModal } from './components/DeployModal'; 
 import { V38ChatModal } from './components/V38ChatModal';
+import { AgentFinOpsModal } from './components/AgentFinOpsModal';
 import { Toast, ToastType } from './components/Toast';
 import { analyzeAndOptimizeStream, GeminiError } from './services/geminiService';
 import { moatService } from './services/moatService';
@@ -20,7 +21,7 @@ import { demoOrchestrator } from './services/demoOrchestrator'; // Clean Import
 import { MOCK_ANALYSIS_RESULT } from './services/mockData';
 import { HardwareProfile, AnalysisResult, INITIAL_CODE, EXAMPLES, DEMO_SKETCH } from './types';
 import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip, Legend } from 'recharts';
-import { Leaf, Cpu, Zap, ArrowRight, Activity, Info, Database, Lightbulb, AlertTriangle, CheckCircle2, HelpCircle, ShieldCheck, Share2, Lock, EyeOff, BookOpen, ChevronDown, BrainCircuit, Search, Server, FileText, Bug, Settings, Download, DollarSign, PlayCircle, Link as LinkIcon, Maximize2, GitMerge, Rocket, Scale, Sparkles } from 'lucide-react';
+import { Leaf, Cpu, Zap, ArrowRight, Activity, Info, Database, Lightbulb, AlertTriangle, CheckCircle2, HelpCircle, ShieldCheck, Share2, Lock, EyeOff, BookOpen, ChevronDown, BrainCircuit, Search, Server, FileText, Bug, Settings, Download, DollarSign, PlayCircle, Link as LinkIcon, Maximize2, GitMerge, Rocket, Scale, Sparkles, Bot } from 'lucide-react';
 
 export default function App() {
   const [code, setCode] = useState(INITIAL_CODE);
@@ -48,6 +49,8 @@ export default function App() {
   const [isCalibrated, setIsCalibrated] = useState(false);
   // New: V38 Chat State
   const [showV38Chat, setShowV38Chat] = useState(false);
+  // New: Agent FinOps State
+  const [showAgentModal, setShowAgentModal] = useState(false);
 
   // UI State
   const [showHelp, setShowHelp] = useState(false);
@@ -355,6 +358,10 @@ ${result.recommendations.map(r => `- [${r.category}] **${r.title}**: ${r.reasoni
         isOpen={showDeployModal}
         onClose={() => setShowDeployModal(false)}
       />
+      <AgentFinOpsModal 
+        isOpen={showAgentModal}
+        onClose={() => setShowAgentModal(false)}
+      />
       <V38ChatModal
         isOpen={showV38Chat}
         onClose={() => setShowV38Chat(false)}
@@ -391,6 +398,14 @@ ${result.recommendations.map(r => `- [${r.category}] **${r.title}**: ${r.reasoni
                 >
                    <Sparkles className="w-3.5 h-3.5 group-hover:text-yellow-300" />
                    <span>V38 Wisdom Pilot</span>
+                </button>
+                <button 
+                  onClick={() => setShowAgentModal(true)}
+                  className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-blue-500/10 border border-blue-500/30 hover:border-blue-400 text-blue-300 hover:text-white text-xs font-bold transition-all group"
+                  title="Agent Token FinOps Simulator"
+                >
+                   <Bot className="w-3.5 h-3.5" />
+                   <span>Agent FinOps</span>
                 </button>
                 <button 
                   onClick={() => setShowCiCdSim(true)}
