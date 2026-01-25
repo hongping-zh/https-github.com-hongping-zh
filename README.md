@@ -33,6 +33,7 @@ EcoCompute is a **CI/CD Gatekeeper**. It intercepts expensive code **before it m
 | 🔮 **Pre-Merge Cost Prediction** | Estimates $$$ of a training run by analyzing AST + Arithmetic Intensity |
 | 🧠 **Hybrid Reasoning Engine** | Uses **Gemini 3 Pro** to understand complex model architectures (Transformers, CNNs) |
 | 🛑 **Budget Enforcement** | Automatically blocks Pull Requests that violate team budget policies |
+| 🤖 **Agent Token FinOps** | **NEW!** Predicts token costs for multi-agent workflows (e.g., Google Antigravity) before execution |
 | 🔋 **Carbon Impact Report** | Translates FLOPs into CO₂e/kWh with regional grid data |
 | ⚡ **Auto-Optimization** | Suggests refactors (Quantization, Fusion) to cut costs by 30-50% |
 
