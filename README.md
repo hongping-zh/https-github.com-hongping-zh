@@ -89,6 +89,16 @@ Unlike theoretical estimates, EcoCompute uses a **physics-based model calibrated
 
 ---
 
+<div align="center">
+
+## 🧮 [Try Our Interactive Training Cost Calculator ➔](https://hongping-zh.github.io/ecocompute-ai/calculator/)
+
+**Estimate costs & carbon footprint before you train — no signup required!**
+
+</div>
+
+---
+
 ## 🚀 Quick Start
 
 ### Option 1: Try Live Demo (No Install)

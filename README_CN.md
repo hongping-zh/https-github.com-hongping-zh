@@ -89,6 +89,16 @@ graph TD
 
 ---
 
+<div align="center">
+
+## 🧮 [试用交互式训练成本计算器 ➔](https://hongping-zh.github.io/ecocompute-ai/calculator/)
+
+**训练前预估成本和碳排放 — 无需注册！**
+
+</div>
+
+---
+
 ## 🚀 快速开始
 
 ### 方式 1：在线演示（无需安装）
