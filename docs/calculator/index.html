@@ -183,12 +183,84 @@
         <!-- CTA -->
         <div class="mt-12 text-center">
             <p class="text-gray-400 mb-4">Want automated cost checks in your CI/CD pipeline?</p>
-            <a href="https://github.com/hongping-zh/ecocompute-ai" 
-               class="inline-flex items-center gap-2 bg-green-600 hover:bg-green-500 text-white font-semibold px-6 py-3 rounded-lg transition">
-                🚀 Try GitHub Action
-            </a>
+            <div class="flex flex-wrap justify-center gap-4">
+                <a href="https://github.com/hongping-zh/ecocompute-ai" 
+                   class="inline-flex items-center gap-2 bg-green-600 hover:bg-green-500 text-white font-semibold px-6 py-3 rounded-lg transition">
+                    🚀 Try GitHub Action
+                </a>
+                <button onclick="openCiteModal()" 
+                        class="inline-flex items-center gap-2 bg-slate-700 hover:bg-slate-600 text-white font-semibold px-6 py-3 rounded-lg transition border border-slate-600">
+                    📚 Cite This Tool
+                </button>
+            </div>
         </div>
     </main>
+
+    <!-- Citation Modal -->
+    <div id="citeModal" class="fixed inset-0 bg-black/70 hidden items-center justify-center z-50 p-4">
+        <div class="bg-slate-800 rounded-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto">
+            <div class="p-6 border-b border-slate-700 flex justify-between items-center">
+                <h3 class="text-xl font-bold text-green-400">📚 Cite EcoCompute AI</h3>
+                <button onclick="closeCiteModal()" class="text-gray-400 hover:text-white text-2xl">&times;</button>
+            </div>
+            <div class="p-6 space-y-6">
+                <!-- BibTeX -->
+                <div>
+                    <div class="flex justify-between items-center mb-2">
+                        <label class="text-sm font-semibold text-gray-300">BibTeX</label>
+                        <button onclick="copyToClipboard('bibtex')" class="text-xs bg-green-600 hover:bg-green-500 px-3 py-1 rounded text-white">
+                            Copy
+                        </button>
+                    </div>
+                    <pre id="bibtex" class="bg-slate-900 p-4 rounded-lg text-sm text-gray-300 overflow-x-auto">@software{zhang2026ecocompute,
+  author = {Zhang, Hongping},
+  title = {EcoCompute AI: Pre-Merge Cost Prediction and Carbon Tracking for AI Training},
+  year = {2026},
+  url = {https://github.com/hongping-zh/ecocompute-ai},
+  version = {1.0.0}
+}</pre>
+                </div>
+
+                <!-- APA -->
+                <div>
+                    <div class="flex justify-between items-center mb-2">
+                        <label class="text-sm font-semibold text-gray-300">APA</label>
+                        <button onclick="copyToClipboard('apa')" class="text-xs bg-green-600 hover:bg-green-500 px-3 py-1 rounded text-white">
+                            Copy
+                        </button>
+                    </div>
+                    <div id="apa" class="bg-slate-900 p-4 rounded-lg text-sm text-gray-300">
+                        Zhang, H. (2026). <em>EcoCompute AI: Pre-Merge Cost Prediction and Carbon Tracking for AI Training</em> (Version 1.0.0) [Computer software]. https://github.com/hongping-zh/ecocompute-ai
+                    </div>
+                </div>
+
+                <!-- Chicago -->
+                <div>
+                    <div class="flex justify-between items-center mb-2">
+                        <label class="text-sm font-semibold text-gray-300">Chicago</label>
+                        <button onclick="copyToClipboard('chicago')" class="text-xs bg-green-600 hover:bg-green-500 px-3 py-1 rounded text-white">
+                            Copy
+                        </button>
+                    </div>
+                    <div id="chicago" class="bg-slate-900 p-4 rounded-lg text-sm text-gray-300">
+                        Zhang, Hongping. "EcoCompute AI: Pre-Merge Cost Prediction and Carbon Tracking for AI Training." Version 1.0.0. 2026. https://github.com/hongping-zh/ecocompute-ai.
+                    </div>
+                </div>
+
+                <!-- ORCID -->
+                <div class="text-center pt-4 border-t border-slate-700">
+                    <p class="text-sm text-gray-400">
+                        Author ORCID: <a href="https://orcid.org/0009-0000-2529-4613" target="_blank" class="text-green-400 hover:underline">0009-0000-2529-4613</a>
+                    </p>
+                    <p class="text-sm text-gray-500 mt-2">
+                        <a href="https://github.com/hongping-zh/ecocompute-ai/blob/main/paper/EcoCompute_AI_Technical_Report.pdf" target="_blank" class="text-green-400 hover:underline">
+                            📄 Download Technical Report (PDF)
+                        </a>
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
 
     <!-- Footer -->
     <footer class="py-8 px-4 mt-12 border-t border-slate-700">
@@ -329,6 +401,49 @@
 
         // Initial calculation
         calculate();
+
+        // Citation Modal Functions
+        function openCiteModal() {
+            const modal = document.getElementById('citeModal');
+            modal.classList.remove('hidden');
+            modal.classList.add('flex');
+        }
+
+        function closeCiteModal() {
+            const modal = document.getElementById('citeModal');
+            modal.classList.add('hidden');
+            modal.classList.remove('flex');
+        }
+
+        function copyToClipboard(elementId) {
+            const element = document.getElementById(elementId);
+            const text = element.innerText || element.textContent;
+            navigator.clipboard.writeText(text).then(() => {
+                // Show feedback
+                const btn = event.target;
+                const originalText = btn.textContent;
+                btn.textContent = 'Copied!';
+                btn.classList.add('bg-green-500');
+                setTimeout(() => {
+                    btn.textContent = originalText;
+                    btn.classList.remove('bg-green-500');
+                }, 1500);
+            });
+        }
+
+        // Close modal on outside click
+        document.getElementById('citeModal').addEventListener('click', function(e) {
+            if (e.target === this) {
+                closeCiteModal();
+            }
+        });
+
+        // Close modal on Escape key
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape') {
+                closeCiteModal();
+            }
+        });
     </script>
 </body>
 </html>
