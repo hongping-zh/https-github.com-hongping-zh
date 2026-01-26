@@ -1,0 +1,25 @@
+{
+  "estimated_cost": 3.0,
+  "estimated_carbon": 0.19,
+  "estimated_hours": 1.2,
+  "files_analyzed": 5,
+  "ml_files_found": 2,
+  "training_loops_detected": 0,
+  "optimization_suggestions": [
+    {
+      "title": "Consider Mixed Precision Training",
+      "description": "Large models detected. Using FP16/BF16 can reduce memory and speed up training by 2x.",
+      "potential_savings": "30-50%",
+      "priority": "high"
+    }
+  ],
+  "passed": true,
+  "details": {
+    "estimated_hours": 1.2,
+    "estimated_cost": 3.0,
+    "estimated_carbon": 0.19,
+    "ml_files": 2,
+    "training_files": 0,
+    "total_complexity": 10
+  }
+}

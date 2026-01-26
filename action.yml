@@ -1,0 +1,101 @@
+name: 'EcoCompute AI Cost Gate'
+description: 'CI/CD gatekeeper that predicts AI training costs and carbon footprint before code merges. Catch expensive AI code before it hits production.'
+author: 'hongping-zh'
+
+branding:
+  icon: 'zap'
+  color: 'green'
+
+inputs:
+  budget_limit:
+    description: 'Maximum allowed cost in USD per training run'
+    required: false
+    default: '500'
+  carbon_limit:
+    description: 'Maximum allowed carbon footprint in kg CO2e'
+    required: false
+    default: '50'
+  gpu:
+    description: 'Target GPU for cost estimation (e.g., nvidia-h100, nvidia-a100, nvidia-v100)'
+    required: false
+    default: 'nvidia-a100'
+  fail_on_exceed:
+    description: 'Fail the workflow if budget or carbon limit is exceeded'
+    required: false
+    default: 'true'
+  comment_on_pr:
+    description: 'Post analysis results as a PR comment'
+    required: false
+    default: 'true'
+  include_patterns:
+    description: 'Glob patterns for files to analyze (comma-separated)'
+    required: false
+    default: '**/*.py'
+  exclude_patterns:
+    description: 'Glob patterns for files to exclude (comma-separated)'
+    required: false
+    default: '**/test_*.py,**/*_test.py,**/tests/**'
+
+outputs:
+  estimated_cost:
+    description: 'Predicted training cost in USD'
+  estimated_carbon:
+    description: 'Predicted carbon footprint in kg CO2e'
+  optimization_suggestions:
+    description: 'JSON array of optimization suggestions'
+  passed:
+    description: 'Whether the check passed (true/false)'
+  report_url:
+    description: 'URL to the detailed analysis report'
+
+runs:
+  using: 'composite'
+  steps:
+    - name: Setup Python
+      uses: actions/setup-python@v5
+      with:
+        python-version: '3.10'
+
+    - name: Install EcoCompute CLI
+      shell: bash
+      run: |
+        pip install -q requests
+
+    - name: Run EcoCompute Analysis
+      id: analyze
+      shell: bash
+      env:
+        BUDGET_LIMIT: ${{ inputs.budget_limit }}
+        CARBON_LIMIT: ${{ inputs.carbon_limit }}
+        GPU: ${{ inputs.gpu }}
+        INCLUDE_PATTERNS: ${{ inputs.include_patterns }}
+        EXCLUDE_PATTERNS: ${{ inputs.exclude_patterns }}
+      run: |
+        python ${{ github.action_path }}/scripts/analyze.py
+
+    - name: Post PR Comment
+      if: ${{ inputs.comment_on_pr == 'true' && github.event_name == 'pull_request' }}
+      uses: actions/github-script@v7
+      with:
+        script: |
+          const fs = require('fs');
+          const report = fs.readFileSync('ecocompute_report.md', 'utf8');
+          
+          github.rest.issues.createComment({
+            issue_number: context.issue.number,
+            owner: context.repo.owner,
+            repo: context.repo.repo,
+            body: report
+          });
+
+    - name: Check Budget
+      if: ${{ inputs.fail_on_exceed == 'true' }}
+      shell: bash
+      run: |
+        if [ -f "ecocompute_result.json" ]; then
+          PASSED=$(cat ecocompute_result.json | python -c "import sys, json; print(json.load(sys.stdin).get('passed', True))")
+          if [ "$PASSED" = "False" ]; then
+            echo "❌ EcoCompute: Budget or carbon limit exceeded!"
+            exit 1
+          fi
+        fi
