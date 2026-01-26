@@ -323,11 +323,12 @@ def predict_swarm_cost(turns: int = 15, repo_tokens: int = 50000) -> Dict:
         "total": subtotal + overhead
     }
 
-# Run prediction
-result = predict_swarm_cost(turns=15, repo_tokens=50000)
+# Run prediction (Enterprise scenario)
+result = predict_swarm_cost(turns=25, repo_tokens=150000)
 print(f"Total Predicted Cost: \${result['total']:.2f}")
-print(f"Without FinOps (monthly): \${result['total'] * 10:.2f}")
-print(f"With FinOps (51% savings): \${result['total'] * 10 * 0.49:.2f}")`
+print(f"Without FinOps (monthly, 30 tasks): \${result['total'] * 30:.2f}")
+print(f"With FinOps (51% savings): \${result['total'] * 30 * 0.49:.2f}")
+print(f"Annual Savings: \${result['total'] * 30 * 0.51 * 12:.2f}")`
 };
 
 export const INITIAL_CODE = EXAMPLES['ResNet-50 Block (Baseline)'];

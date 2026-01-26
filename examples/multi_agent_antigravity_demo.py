@@ -234,12 +234,12 @@ def run_demo():
     print("=" * 60)
     print()
     
-    # Define a realistic development task
+    # Define a realistic ENTERPRISE development task
     task = Task(
         id="FEAT-001",
-        description="Build a user authentication system with OAuth2",
-        estimated_turns=15,
-        repo_context_tokens=50000  # Medium-sized codebase
+        description="Build microservices payment gateway with fraud detection",
+        estimated_turns=25,  # Complex enterprise task
+        repo_context_tokens=150000  # Large monorepo codebase
     )
     
     print(f"📋 Task: {task.description}")
@@ -298,14 +298,14 @@ def compare_with_without_finops():
     print("📈 Cost Comparison: With vs Without Agent FinOps")
     print("=" * 60)
     
-    # Scenario: 10 development tasks over a month
-    tasks_per_month = 10
+    # Scenario: Enterprise team with 30 development tasks per month
+    tasks_per_month = 30
     
     task = Task(
         id="MONTHLY",
-        description="Average development task",
-        estimated_turns=15,
-        repo_context_tokens=50000
+        description="Average enterprise development task",
+        estimated_turns=25,
+        repo_context_tokens=150000
     )
     
     predictor = AgentFinOpsPredictor(AGENT_SWARM)
