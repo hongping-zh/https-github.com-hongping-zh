@@ -75,35 +75,19 @@ We use a **Tiered Gatekeeper** to maximize ROI:
 ## 🚀 Quick Start
 
 ### Option 1: Try Live Demo (No Install)
+
+**[🌐 Try EcoCompute AI Now →](https://ecocompute-ai-kexlce2qtz.edgeone.dev/)**
+
+> No signup required. Paste your PyTorch/TensorFlow code and get instant cost estimates.
+
+### Option 2: CLI (Coming Soon)
+
 ```bash
-# Just click the link below — works in browser!
-```
-**[🌐 Try EcoCompute AI Now →](https://ecocompute-ai-elb0yplu9w.edgeone.dev/)**
-
-### Option 2: Install CLI
-```bash
-pip install ecocompute-ai
-ecocompute start
+# 🚧 CLI is under development — Star the repo to get notified!
+pip install ecocompute-ai  # Coming Q2 2026
 ```
 
-### Option 3: One-Line Audit
-```bash
-ecocompute audit --path ./model.py --gpu "nvidia-h100"
-```
-
-**Output:**
-```
-┌─────────────────────────────────────────────────┐
-│ 🔍 EcoCompute Analysis Report                   │
-├─────────────────────────────────────────────────┤
-│ Estimated Cost:     $487.50                     │
-│ Estimated Carbon:   12.3 kg CO₂e                │
-│ Optimization Found: Matrix multiplication L45   │
-│ Potential Savings:  $150 (31%)                  │
-└─────────────────────────────────────────────────┘
-```
-
-### Add to GitHub Actions
+### Option 3: GitHub Actions Integration
 Create `.github/workflows/ecocompute.yml`:
 ```yaml
 name: EcoCompute Cost Gate
