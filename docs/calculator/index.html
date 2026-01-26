@@ -5,12 +5,33 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>EcoCompute AI - Training Cost Calculator</title>
     <meta name="description" content="Estimate AI training costs and carbon footprint before you train. Free, instant, accurate.">
-    <link rel="icon" href="../../assets/logo-simple.svg" type="image/svg+xml">
+    <link rel="icon" href="https://raw.githubusercontent.com/hongping-zh/ecocompute-ai/main/assets/logo-simple.svg" type="image/svg+xml">
     <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        slate: {
+                            700: '#334155',
+                            800: '#1e293b',
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
-        body { font-family: 'Inter', sans-serif; }
-        .gradient-bg { background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%); }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { 
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+            min-height: 100vh;
+            color: white;
+        }
         .green-glow { box-shadow: 0 0 30px rgba(34, 197, 94, 0.3); }
     </style>
 </head>
@@ -19,7 +40,7 @@
     <header class="py-6 px-4">
         <div class="max-w-4xl mx-auto flex items-center justify-between">
             <div class="flex items-center gap-3">
-                <img src="../../assets/logo-simple.svg" alt="EcoCompute AI" class="w-10 h-10">
+                <img src="https://raw.githubusercontent.com/hongping-zh/ecocompute-ai/main/assets/logo-simple.svg" alt="EcoCompute AI" class="w-10 h-10">
                 <span class="text-xl font-bold text-green-400">EcoCompute AI</span>
             </div>
             <a href="https://github.com/hongping-zh/ecocompute-ai" 
