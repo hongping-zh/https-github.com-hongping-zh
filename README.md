@@ -10,10 +10,11 @@
 [![Python](https://img.shields.io/badge/Python-3.8+-blue.svg)](https://www.python.org/)
 [![Build](https://img.shields.io/github/actions/workflow/status/hongping-zh/ecocompute-ai/ecocompute-analysis.yml?label=CI)](https://github.com/hongping-zh/ecocompute-ai/actions)
 [![Demo](https://img.shields.io/badge/🚀_Live_Demo-Try_Now-orange)](https://ecocompute-ai-elb0yplu9w.edgeone.dev/)
+[![Calculator](https://img.shields.io/badge/🧮_Cost_Calculator-Try_Free-brightgreen)](https://hongping-zh.github.io/ecocompute-ai/calculator/)
 
 **The CI/CD Gatekeeper that catches expensive AI code before it hits production.**
 
-[Try Live Demo](https://ecocompute-ai-elb0yplu9w.edgeone.dev/) · [Report Bug](https://github.com/hongping-zh/ecocompute-ai/issues) · [Request Feature](https://github.com/hongping-zh/ecocompute-ai/discussions)
+[🚀 Try Live Demo](https://ecocompute-ai-elb0yplu9w.edgeone.dev/) · [🧮 Cost Calculator](https://hongping-zh.github.io/ecocompute-ai/calculator/) · [Report Bug](https://github.com/hongping-zh/ecocompute-ai/issues)
 
 </div>
 

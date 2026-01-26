@@ -10,10 +10,11 @@
 [![Python](https://img.shields.io/badge/Python-3.8+-blue.svg)](https://www.python.org/)
 [![Build](https://img.shields.io/github/actions/workflow/status/hongping-zh/ecocompute-ai/ecocompute-analysis.yml?label=CI)](https://github.com/hongping-zh/ecocompute-ai/actions)
 [![Demo](https://img.shields.io/badge/🚀_在线演示-立即体验-orange)](https://ecocompute-ai-elb0yplu9w.edgeone.dev/)
+[![Calculator](https://img.shields.io/badge/🧮_成本计算器-免费使用-brightgreen)](https://hongping-zh.github.io/ecocompute-ai/calculator/)
 
 **在代码进入生产环境之前，拦截高成本 AI 代码的 CI/CD 守门员**
 
-[在线演示](https://ecocompute-ai-elb0yplu9w.edgeone.dev/) · [报告 Bug](https://github.com/hongping-zh/ecocompute-ai/issues) · [功能建议](https://github.com/hongping-zh/ecocompute-ai/discussions)
+[🚀 在线演示](https://ecocompute-ai-elb0yplu9w.edgeone.dev/) · [🧮 成本计算器](https://hongping-zh.github.io/ecocompute-ai/calculator/) · [报告 Bug](https://github.com/hongping-zh/ecocompute-ai/issues)
 
 </div>
 
