@@ -1,0 +1,92 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" width="200" height="200">
+  <defs>
+    <!-- Gradient for the leaf/chip hybrid -->
+    <linearGradient id="greenGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#22c55e;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#16a34a;stop-opacity:1" />
+    </linearGradient>
+    
+    <!-- Gradient for circuit lines -->
+    <linearGradient id="circuitGradient" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" style="stop-color:#86efac;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#4ade80;stop-opacity:1" />
+    </linearGradient>
+    
+    <!-- Glow effect -->
+    <filter id="glow" x="-50%" y="-50%" width="200%" height="200%">
+      <feGaussianBlur stdDeviation="2" result="coloredBlur"/>
+      <feMerge>
+        <feMergeNode in="coloredBlur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+  </defs>
+  
+  <!-- Background circle -->
+  <circle cx="100" cy="100" r="90" fill="#0f172a"/>
+  
+  <!-- Main leaf/chip shape -->
+  <path d="M100 25 
+           C140 25, 170 55, 170 95
+           C170 135, 140 165, 100 175
+           C60 165, 30 135, 30 95
+           C30 55, 60 25, 100 25Z" 
+        fill="url(#greenGradient)" 
+        filter="url(#glow)"/>
+  
+  <!-- Leaf vein / Circuit pattern - main stem -->
+  <path d="M100 45 L100 155" 
+        stroke="url(#circuitGradient)" 
+        stroke-width="4" 
+        stroke-linecap="round"
+        fill="none"/>
+  
+  <!-- Circuit branches - left -->
+  <path d="M100 70 L60 70 L60 85" 
+        stroke="url(#circuitGradient)" 
+        stroke-width="3" 
+        stroke-linecap="round"
+        fill="none"/>
+  <circle cx="60" cy="85" r="4" fill="#86efac"/>
+  
+  <path d="M100 100 L50 100 L50 115" 
+        stroke="url(#circuitGradient)" 
+        stroke-width="3" 
+        stroke-linecap="round"
+        fill="none"/>
+  <circle cx="50" cy="115" r="4" fill="#86efac"/>
+  
+  <path d="M100 130 L65 130 L65 145" 
+        stroke="url(#circuitGradient)" 
+        stroke-width="3" 
+        stroke-linecap="round"
+        fill="none"/>
+  <circle cx="65" cy="145" r="4" fill="#86efac"/>
+  
+  <!-- Circuit branches - right -->
+  <path d="M100 70 L140 70 L140 85" 
+        stroke="url(#circuitGradient)" 
+        stroke-width="3" 
+        stroke-linecap="round"
+        fill="none"/>
+  <circle cx="140" cy="85" r="4" fill="#86efac"/>
+  
+  <path d="M100 100 L150 100 L150 115" 
+        stroke="url(#circuitGradient)" 
+        stroke-width="3" 
+        stroke-linecap="round"
+        fill="none"/>
+  <circle cx="150" cy="115" r="4" fill="#86efac"/>
+  
+  <path d="M100 130 L135 130 L135 145" 
+        stroke="url(#circuitGradient)" 
+        stroke-width="3" 
+        stroke-linecap="round"
+        fill="none"/>
+  <circle cx="135" cy="145" r="4" fill="#86efac"/>
+  
+  <!-- Center node - represents compute core -->
+  <circle cx="100" cy="100" r="12" fill="#0f172a"/>
+  <circle cx="100" cy="100" r="8" fill="#4ade80"/>
+  <circle cx="100" cy="100" r="4" fill="#86efac"/>
+</svg>

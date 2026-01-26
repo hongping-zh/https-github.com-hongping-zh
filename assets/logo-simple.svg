@@ -1,0 +1,31 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="64" height="64">
+  <defs>
+    <linearGradient id="grad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#22c55e"/>
+      <stop offset="100%" style="stop-color:#16a34a"/>
+    </linearGradient>
+  </defs>
+  
+  <!-- Leaf shape -->
+  <path d="M32 4 C48 4, 58 18, 58 32 C58 48, 48 58, 32 60 C16 58, 6 48, 6 32 C6 18, 16 4, 32 4Z" 
+        fill="url(#grad)"/>
+  
+  <!-- Circuit stem -->
+  <path d="M32 14 L32 50" stroke="#86efac" stroke-width="3" stroke-linecap="round"/>
+  
+  <!-- Circuit branches -->
+  <path d="M32 24 L18 24" stroke="#86efac" stroke-width="2" stroke-linecap="round"/>
+  <path d="M32 24 L46 24" stroke="#86efac" stroke-width="2" stroke-linecap="round"/>
+  <path d="M32 36 L14 36" stroke="#86efac" stroke-width="2" stroke-linecap="round"/>
+  <path d="M32 36 L50 36" stroke="#86efac" stroke-width="2" stroke-linecap="round"/>
+  
+  <!-- Nodes -->
+  <circle cx="18" cy="24" r="3" fill="#dcfce7"/>
+  <circle cx="46" cy="24" r="3" fill="#dcfce7"/>
+  <circle cx="14" cy="36" r="3" fill="#dcfce7"/>
+  <circle cx="50" cy="36" r="3" fill="#dcfce7"/>
+  
+  <!-- Center core -->
+  <circle cx="32" cy="32" r="6" fill="#0f172a"/>
+  <circle cx="32" cy="32" r="4" fill="#4ade80"/>
+</svg>

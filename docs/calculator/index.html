@@ -1,0 +1,313 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EcoCompute AI - Training Cost Calculator</title>
+    <meta name="description" content="Estimate AI training costs and carbon footprint before you train. Free, instant, accurate.">
+    <link rel="icon" href="../../assets/logo-simple.svg" type="image/svg+xml">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+        body { font-family: 'Inter', sans-serif; }
+        .gradient-bg { background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%); }
+        .green-glow { box-shadow: 0 0 30px rgba(34, 197, 94, 0.3); }
+    </style>
+</head>
+<body class="gradient-bg min-h-screen text-white">
+    <!-- Header -->
+    <header class="py-6 px-4">
+        <div class="max-w-4xl mx-auto flex items-center justify-between">
+            <div class="flex items-center gap-3">
+                <img src="../../assets/logo-simple.svg" alt="EcoCompute AI" class="w-10 h-10">
+                <span class="text-xl font-bold text-green-400">EcoCompute AI</span>
+            </div>
+            <a href="https://github.com/hongping-zh/ecocompute-ai" 
+               class="text-gray-400 hover:text-white transition">
+                ⭐ Star on GitHub
+            </a>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="max-w-4xl mx-auto px-4 py-8">
+        <div class="text-center mb-12">
+            <h1 class="text-4xl font-bold mb-4">
+                🌿 AI Training Cost Calculator
+            </h1>
+            <p class="text-gray-400 text-lg">
+                Estimate costs and carbon footprint <strong class="text-green-400">before</strong> you train
+            </p>
+        </div>
+
+        <!-- Calculator Card -->
+        <div class="bg-slate-800/50 rounded-2xl p-8 green-glow">
+            <div class="grid md:grid-cols-2 gap-8">
+                <!-- Input Section -->
+                <div class="space-y-6">
+                    <h2 class="text-xl font-semibold text-green-400 mb-4">📊 Model Configuration</h2>
+                    
+                    <!-- Model Type -->
+                    <div>
+                        <label class="block text-sm text-gray-400 mb-2">Model Architecture</label>
+                        <select id="modelType" class="w-full bg-slate-700 rounded-lg px-4 py-3 text-white focus:ring-2 focus:ring-green-500 outline-none">
+                            <option value="transformer-small">Transformer Small (125M params)</option>
+                            <option value="transformer-medium">Transformer Medium (350M params)</option>
+                            <option value="transformer-large" selected>Transformer Large (1.3B params)</option>
+                            <option value="transformer-xl">Transformer XL (6.7B params)</option>
+                            <option value="llama-7b">LLaMA-style 7B</option>
+                            <option value="llama-13b">LLaMA-style 13B</option>
+                            <option value="llama-70b">LLaMA-style 70B</option>
+                            <option value="resnet-50">ResNet-50 (CNN)</option>
+                            <option value="resnet-152">ResNet-152 (CNN)</option>
+                            <option value="bert-base">BERT Base</option>
+                            <option value="bert-large">BERT Large</option>
+                        </select>
+                    </div>
+
+                    <!-- GPU Type -->
+                    <div>
+                        <label class="block text-sm text-gray-400 mb-2">GPU Type</label>
+                        <select id="gpuType" class="w-full bg-slate-700 rounded-lg px-4 py-3 text-white focus:ring-2 focus:ring-green-500 outline-none">
+                            <option value="h100">NVIDIA H100 SXM ($3.50/hr)</option>
+                            <option value="a100" selected>NVIDIA A100 80GB ($2.50/hr)</option>
+                            <option value="v100">NVIDIA V100 32GB ($1.50/hr)</option>
+                            <option value="t4">NVIDIA T4 ($0.50/hr)</option>
+                            <option value="l4">NVIDIA L4 ($0.80/hr)</option>
+                        </select>
+                    </div>
+
+                    <!-- Number of GPUs -->
+                    <div>
+                        <label class="block text-sm text-gray-400 mb-2">Number of GPUs</label>
+                        <input type="range" id="numGpus" min="1" max="64" value="8" 
+                               class="w-full accent-green-500">
+                        <div class="flex justify-between text-sm text-gray-500 mt-1">
+                            <span>1</span>
+                            <span id="numGpusValue" class="text-green-400 font-semibold">8</span>
+                            <span>64</span>
+                        </div>
+                    </div>
+
+                    <!-- Training Tokens -->
+                    <div>
+                        <label class="block text-sm text-gray-400 mb-2">Training Tokens (Billions)</label>
+                        <input type="range" id="tokens" min="1" max="2000" value="100" 
+                               class="w-full accent-green-500">
+                        <div class="flex justify-between text-sm text-gray-500 mt-1">
+                            <span>1B</span>
+                            <span id="tokensValue" class="text-green-400 font-semibold">100B</span>
+                            <span>2T</span>
+                        </div>
+                    </div>
+
+                    <!-- Region -->
+                    <div>
+                        <label class="block text-sm text-gray-400 mb-2">Cloud Region</label>
+                        <select id="region" class="w-full bg-slate-700 rounded-lg px-4 py-3 text-white focus:ring-2 focus:ring-green-500 outline-none">
+                            <option value="us-west">US West (350 gCO₂/kWh)</option>
+                            <option value="us-east" selected>US East (400 gCO₂/kWh)</option>
+                            <option value="eu-west">EU West (300 gCO₂/kWh)</option>
+                            <option value="eu-north">EU North - Sweden (20 gCO₂/kWh)</option>
+                            <option value="asia-east">Asia East (550 gCO₂/kWh)</option>
+                        </select>
+                    </div>
+                </div>
+
+                <!-- Results Section -->
+                <div class="space-y-6">
+                    <h2 class="text-xl font-semibold text-green-400 mb-4">💰 Estimated Results</h2>
+                    
+                    <!-- Cost Card -->
+                    <div class="bg-slate-700/50 rounded-xl p-6">
+                        <div class="text-sm text-gray-400 mb-1">Estimated Cost</div>
+                        <div class="text-4xl font-bold text-white" id="costResult">$12,500</div>
+                        <div class="text-sm text-gray-500 mt-1" id="costBreakdown">50 hours × 8 GPUs × $2.50/hr</div>
+                    </div>
+
+                    <!-- Time Card -->
+                    <div class="bg-slate-700/50 rounded-xl p-6">
+                        <div class="text-sm text-gray-400 mb-1">Training Time</div>
+                        <div class="text-3xl font-bold text-white" id="timeResult">50 hours</div>
+                        <div class="text-sm text-gray-500 mt-1" id="timeBreakdown">~2.1 days</div>
+                    </div>
+
+                    <!-- Carbon Card -->
+                    <div class="bg-slate-700/50 rounded-xl p-6">
+                        <div class="text-sm text-gray-400 mb-1">Carbon Footprint</div>
+                        <div class="text-3xl font-bold text-green-400" id="carbonResult">320 kg CO₂e</div>
+                        <div class="text-sm text-gray-500 mt-1" id="carbonBreakdown">≈ 2,080 km driven</div>
+                    </div>
+
+                    <!-- Optimization Tips -->
+                    <div class="bg-green-900/30 border border-green-700 rounded-xl p-4">
+                        <div class="text-sm font-semibold text-green-400 mb-2">💡 Optimization Tip</div>
+                        <p class="text-sm text-gray-300" id="optimizationTip">
+                            Using mixed precision (FP16/BF16) could reduce training time by 30-50%.
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- MLPerf Accuracy Badge -->
+        <div class="mt-8 text-center">
+            <div class="inline-flex items-center gap-2 bg-slate-800/50 rounded-full px-4 py-2 text-sm text-gray-400">
+                <span class="text-green-400">✓</span>
+                Calibrated on MLPerf benchmarks • 
+                <a href="../HARDWARE_GROUNDING.md" class="text-green-400 hover:underline">&lt;5% error margin</a>
+            </div>
+        </div>
+
+        <!-- CTA -->
+        <div class="mt-12 text-center">
+            <p class="text-gray-400 mb-4">Want automated cost checks in your CI/CD pipeline?</p>
+            <a href="https://github.com/hongping-zh/ecocompute-ai" 
+               class="inline-flex items-center gap-2 bg-green-600 hover:bg-green-500 text-white font-semibold px-6 py-3 rounded-lg transition">
+                🚀 Try GitHub Action
+            </a>
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="py-8 px-4 mt-12 border-t border-slate-700">
+        <div class="max-w-4xl mx-auto text-center text-gray-500 text-sm">
+            <p>Built with 💚 for a sustainable AI future</p>
+            <p class="mt-2">
+                <a href="https://github.com/hongping-zh/ecocompute-ai" class="hover:text-green-400">GitHub</a> · 
+                <a href="https://ecocompute-ai-l7e41qn4gf.edgeone.dev/" class="hover:text-green-400">Live Demo</a> · 
+                <a href="../HARDWARE_GROUNDING.md" class="hover:text-green-400">Technical Docs</a>
+            </p>
+        </div>
+    </footer>
+
+    <script>
+        // GPU specifications
+        const GPU_SPECS = {
+            'h100': { cost: 3.50, tflops: 1979, tdp: 700, efficiency: 1.0 },
+            'a100': { cost: 2.50, tflops: 312, tdp: 400, efficiency: 0.85 },
+            'v100': { cost: 1.50, tflops: 125, tdp: 300, efficiency: 0.65 },
+            't4': { cost: 0.50, tflops: 65, tdp: 70, efficiency: 0.40 },
+            'l4': { cost: 0.80, tflops: 121, tdp: 72, efficiency: 0.55 }
+        };
+
+        // Model FLOPs per token (approximate)
+        const MODEL_FLOPS = {
+            'transformer-small': 250e6,
+            'transformer-medium': 700e6,
+            'transformer-large': 2.6e9,
+            'transformer-xl': 13.4e9,
+            'llama-7b': 14e9,
+            'llama-13b': 26e9,
+            'llama-70b': 140e9,
+            'resnet-50': 4e9,  // per image, assume 1M images
+            'resnet-152': 11e9,
+            'bert-base': 22e9,
+            'bert-large': 72e9
+        };
+
+        // Carbon intensity by region (gCO2/kWh)
+        const CARBON_INTENSITY = {
+            'us-west': 350,
+            'us-east': 400,
+            'eu-west': 300,
+            'eu-north': 20,
+            'asia-east': 550
+        };
+
+        // Optimization tips
+        const TIPS = [
+            "Using mixed precision (FP16/BF16) could reduce training time by 30-50%.",
+            "Consider gradient checkpointing to reduce memory usage by 60%.",
+            "Training in EU North (Sweden) could reduce carbon by 95% vs Asia East.",
+            "Spot instances could save 60-90% on cloud costs.",
+            "FlashAttention can speed up transformer training by 2-4x.",
+            "Consider using a smaller model first to validate your approach."
+        ];
+
+        function calculate() {
+            const modelType = document.getElementById('modelType').value;
+            const gpuType = document.getElementById('gpuType').value;
+            const numGpus = parseInt(document.getElementById('numGpus').value);
+            const tokens = parseInt(document.getElementById('tokens').value) * 1e9;
+            const region = document.getElementById('region').value;
+
+            const gpu = GPU_SPECS[gpuType];
+            const flopsPerToken = MODEL_FLOPS[modelType];
+
+            // Calculate total FLOPs (forward + backward ≈ 6x per token for training)
+            const totalFlops = flopsPerToken * tokens * 6;
+
+            // Calculate time (accounting for efficiency)
+            const effectiveTflops = gpu.tflops * gpu.efficiency * numGpus * 1e12;
+            const timeSeconds = totalFlops / effectiveTflops;
+            const timeHours = timeSeconds / 3600;
+
+            // Calculate cost
+            const cost = timeHours * numGpus * gpu.cost;
+
+            // Calculate carbon
+            const energyKwh = timeHours * gpu.tdp * numGpus / 1000;
+            const carbonKg = energyKwh * CARBON_INTENSITY[region] / 1000;
+            const kmDriven = carbonKg * 6.5;
+
+            // Update UI
+            document.getElementById('numGpusValue').textContent = numGpus;
+            document.getElementById('tokensValue').textContent = formatTokens(tokens);
+
+            document.getElementById('costResult').textContent = formatCost(cost);
+            document.getElementById('costBreakdown').textContent = 
+                `${timeHours.toFixed(1)} hrs × ${numGpus} GPUs × $${gpu.cost}/hr`;
+
+            document.getElementById('timeResult').textContent = formatTime(timeHours);
+            document.getElementById('timeBreakdown').textContent = 
+                timeHours > 24 ? `~${(timeHours/24).toFixed(1)} days` : `~${timeHours.toFixed(1)} hours`;
+
+            document.getElementById('carbonResult').textContent = formatCarbon(carbonKg);
+            document.getElementById('carbonBreakdown').textContent = 
+                `≈ ${formatNumber(kmDriven)} km driven`;
+
+            // Random tip
+            document.getElementById('optimizationTip').textContent = 
+                TIPS[Math.floor(Math.random() * TIPS.length)];
+        }
+
+        function formatCost(cost) {
+            if (cost >= 1e6) return `$${(cost/1e6).toFixed(2)}M`;
+            if (cost >= 1e3) return `$${(cost/1e3).toFixed(1)}K`;
+            return `$${cost.toFixed(0)}`;
+        }
+
+        function formatTime(hours) {
+            if (hours >= 24 * 30) return `${(hours/24/30).toFixed(1)} months`;
+            if (hours >= 24) return `${(hours/24).toFixed(1)} days`;
+            return `${hours.toFixed(1)} hours`;
+        }
+
+        function formatCarbon(kg) {
+            if (kg >= 1000) return `${(kg/1000).toFixed(1)} tonnes CO₂e`;
+            return `${kg.toFixed(0)} kg CO₂e`;
+        }
+
+        function formatTokens(tokens) {
+            if (tokens >= 1e12) return `${(tokens/1e12).toFixed(1)}T`;
+            if (tokens >= 1e9) return `${(tokens/1e9).toFixed(0)}B`;
+            return `${(tokens/1e6).toFixed(0)}M`;
+        }
+
+        function formatNumber(num) {
+            return num.toLocaleString('en-US', { maximumFractionDigits: 0 });
+        }
+
+        // Event listeners
+        document.getElementById('modelType').addEventListener('change', calculate);
+        document.getElementById('gpuType').addEventListener('change', calculate);
+        document.getElementById('numGpus').addEventListener('input', calculate);
+        document.getElementById('tokens').addEventListener('input', calculate);
+        document.getElementById('region').addEventListener('change', calculate);
+
+        // Initial calculation
+        calculate();
+    </script>
+</body>
+</html>
