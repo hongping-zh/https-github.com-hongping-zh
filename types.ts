@@ -271,10 +271,66 @@ class InvertedResidual(nn.Module):
         if self.use_res_connect:
             return x + self.conv(x)
         else:
-            return self.conv(x)`
+            return self.conv(x)`,
+
+  'Multi-Agent FinOps (Antigravity)': `"""
+Multi-Agent Parallel Development - Cost Prediction Demo
+Shows how EcoCompute Agent FinOps predicts token costs BEFORE execution.
+"""
+from dataclasses import dataclass
+from typing import List, Dict
+
+@dataclass
+class AgentConfig:
+    name: str
+    model: str
+    input_price_per_1m: float
+    output_price_per_1m: float
+
+# Define 5-agent swarm (Antigravity-style)
+AGENT_SWARM = [
+    AgentConfig("Architect", "gemini-2.0-pro", 3.50, 10.50),
+    AgentConfig("Frontend", "gemini-2.0-flash", 0.35, 1.05),
+    AgentConfig("Backend", "gemini-2.0-flash", 0.35, 1.05),
+    AgentConfig("Tester", "gemini-2.0-flash", 0.35, 1.05),
+    AgentConfig("Reviewer", "gemini-2.0-pro", 3.50, 10.50),
+]
+
+def predict_agent_cost(agent: AgentConfig, turns: int, repo_tokens: int) -> float:
+    """Predict cost with Context Ballooning effect."""
+    total_cost = 0.0
+    history_tokens = 0
+    
+    for turn in range(1, turns + 1):
+        input_tokens = 2000 + repo_tokens + history_tokens
+        input_cost = (input_tokens / 1_000_000) * agent.input_price_per_1m
+        output_cost = (1000 / 1_000_000) * agent.output_price_per_1m
+        total_cost += input_cost + output_cost
+        history_tokens += 1050  # Context grows each turn
+    
+    return total_cost
+
+def predict_swarm_cost(turns: int = 15, repo_tokens: int = 50000) -> Dict:
+    """Predict total multi-agent workflow cost."""
+    costs = {a.name: predict_agent_cost(a, turns, repo_tokens) for a in AGENT_SWARM}
+    subtotal = sum(costs.values())
+    overhead = subtotal * 0.2  # Coordination overhead
+    
+    return {
+        "agent_costs": costs,
+        "subtotal": subtotal,
+        "coordination_overhead": overhead,
+        "total": subtotal + overhead
+    }
+
+# Run prediction
+result = predict_swarm_cost(turns=15, repo_tokens=50000)
+print(f"Total Predicted Cost: \${result['total']:.2f}")
+print(f"Without FinOps (monthly): \${result['total'] * 10:.2f}")
+print(f"With FinOps (51% savings): \${result['total'] * 10 * 0.49:.2f}")`
 };
 
 export const INITIAL_CODE = EXAMPLES['ResNet-50 Block (Baseline)'];
 
 // A hand-drawn style SVG of a Residual Block topology
-export const DEMO_SKETCH = `data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA4MDAgNDUwIiBzdHlsZT0iYmFja2dyb3VuZC1jb2xvcjogd2hpdGU7Ij4KICA8ZGVmcz4KICAgIDxtYXJrZXIgaWQ9ImFycm93IiBtYXJrZXJXaWR0aD0iMTAiIG1hcmtlckhlaWdodD0iMTAiIHJlZlg9IjkiIHJlZlk9IjMiIG9yaWVudD0iYXV0byI+CiAgICAgIDxwYXRoIGQ9Ik0wLDAgTDAsNiBMOSwzIHoiIGZpbGw9IiMzMzMiIC8+CiAgICA8L21hcmtlcj4KICA8L2RlZnM+CiAgPHN0eWxlPgogICAgdGV4dCB7IGZvbnQtZmFtaWx5OiAnQ29taWMgU2FucyBNUycsICdDaGFsa2JvYXJkIFNFJywgc2Fucy1zZXJpZjsgZm9udC1zaXplOiAxNnB4OyBmaWxsOiAjMzMzOyB9CiAgICBwYXRoLCByZWN0IHsgc3Ryb2tlOiAjMzMzOyBzdHJva2Utd2lkdGg6IDI7IGZpbGw6IG5vbmU7IHN0cm9rZS1saW5lY2FwOiByb3VuZDsgc3Ryb2tlLWxpbmVqb2luOiByb3VuZDsgfQogIDwvc3R5bGU+CiAgCiAgPCEtLSBJbnB1dCAtLT4KICA8cmVjdCB4PSI1MCIgeT0iMTg1IiB3aWR0aD0iNjAiIGhlaWdodD0iNjAiIHJ4PSI1IiAvPgogIDx0ZXh0IHg9IjU1IiB5PSIyMjAiPklucHV0PC90ZXh0PgogIDx0ZXh0IHg9IjQ1IiB5PSIyNjUiIHN0eWxlPSJmb250LXNpemU6MTJweCI+KHgsIGluX2NoKQo8L3RleHQ+CgogIDwhLS0gQXJyb3cgLS0+CiAgPHBhdGggZD0iTTEyMCAyMTUgSCAxNjAiIG1hcmtlci1lbmQ9InVybCgjYXJyb3cpIiAvPgoKICA8IS0tIFJlc0Jsb2NrIEJveCAtLT4KICA8cmVjdCB4PSIxNzAiIHk9IjkwIiB3aWR0aD0iMjgwIiBoZWlnaHQ9IjI1MCIgc3Ryb2tlLWRhc2hhcnJheT0iNSw1IiBzdHJva2U9IiM2NjYiIC8+CiAgPHRleHQgeD0iMTgwIiB5PSI4MCIgc3R5bGU9ImZpbGw6IzY2NiI+Qm90dGxlbmVjayBCbG9jazwvdGV4dD4KCiAgPCEtLSBDb252IDEgLS0+CiAgPHJlY3QgeD0iMTkwIiB5PSIxMTAiIHdpZHRoPSI4MCIgaGVpZ2h0PSI0MCIgLz4KICA8dGV4dCB4PSIyMDUiIHk9IjEzNSI+Q29udjE8L3RleHQ+CiAgPHRleHQgeD0iMjg1IiB5PSIxMzUiIHN0eWxlPSJmb250LXNpemU6MTJweCI+MXgxPC90ZXh0PgoKICA8IS0tIEFycm93IC0tPgogIDxwYXRoIGQ9Ik0yMzAgMTU1IFYgMTgwIiBtYXJrZXItZW5kPSJ1cmwoI2Fycm93KSIgLz4KICA8IS0tIENvbnYgMyAtLT4KICA8cmVjdCB4PSIxOTAiIHk9IjE5MCIgd2lkdGg9IjgwIiBoZWlnaHQ9IjQwIiAvPgogIDx0ZXh0IHg9IjIwNSIgeT0iMjE1Ij5Db252MzwvdGV4dD4KICA8dGV4dCB4PSIyODUiIHk9IjIxNSIgc3R5bGU9ImZvbnQtc2l6ZToxMnB4Ij4xeDE8L3RleHQ+CgogIDwhLS0gQXJyb3cgLS0+CiAgPHBhdGggZD0iTTIzMCAyMzUgViAyNjAiIG1hcmtlci1lbmQ9InVybCgjYXJyb3cpIiAvPgogIDwhLS0gQ29udiAzIC0tPgogIDxyZWN0IHg9IjE5MCIgeT0iMjcwIiB3aWR0aD0iODAiIGhlaWdodD0iNDAiIC8+CiAgPHRleHQgeD0iMjA1IiB5PSIyOTUiPkNvbnYzPC90ZXh0PgogIDx0ZXh0IHg9IjIwNSIgeT0iMjk1IiBzdHlsZT0iZm9udC1zaXplOjEycHgiPjF4MTwvdGV4dD4KCiAgPCEtLSBTa2lwIENvbm5lY3Rpb24gLS0+CiAgPHBhdGggZD0iTTE2MCAyMTUgViAzNTAgSCAzODAiIHN0eWxlPSJzdHJva2U6ICMyMmM1NWU7IiAvPgogIDx0ZXh0IHg9IjIwMCIgeT0iMzcwIiBzdHlsZT0iZmlsbDojMjJjNTVlOyBmb250LXNpemU6MTJweCI+SWRlbnRpdHkgKFNraXApPC90ZXh0PgoKICA8IS0tIFJlbHUgLyBBZGQgLS0+CiAgPGNpcmNsZSBjeD0iNDAwIiBjeT0iMjkwIiByPSIxNSIgLz4KICA8dGV4dCB4PSIzOTMiIHk9IjI5NSIgc3R5bGU9ImZvbnQtd2VpZ2h0OmJvbGQiPis8L3RleHQ+CgogIDwhLS0gQXJyb3cgLS0+CiAgPHBhdGggZD0iTTI3MCAyOTAgSCAzODAiIG1hcmtlci1lbmQ9InVybCgjYXJyb3cpIiAvPgogIDxwYXRoIGQ9Ik00MDAgMzUwIFYgMzEwIiBtYXJrZXItZW5kPSJ1cmwoI2Fycm93KSIgLz4KICA8IS0tIE91dHB1dCAtLT4KICA8cGF0aCBkPSJNNDE1IDI5MCBIIDQ2MCIgbWFya2VyLWVuZD0idXJsKCNhcnJvdykiIC8+CiAgPHJlY3QgeD0iNDYwIiB5PSIyNjUiIHdpZHRoPSI2MCIgaGVpZ2h0PSI1MCIgLz4KICA8dGV4dCB4PSI0NzAiIHk9IjI5NSI+T3V0PC90ZXh0Pgo8L3N2Zz4=`;
+export const DEMO_SKETCH = `data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA4MDAgNDUwIiBzdHlsZT0iYmFja2dyb3VuZC1jb2xvcjogd2hpdGU7Ij4KICA8ZGVmcz4KICAgIDxtYXJrZXIgaWQ9ImFycm93IiBtYXJrZXJXaWR0aD0iMTAiIG1hcmtlckhlaWdodD0iMTAiIHJlZlg9IjkiIHJlZlk9IjMiIG9yaWVudD0iYXV0byI+CiAgICAgIDxwYXRoIGQ9Ik0wLDAgTDAsNiBMOSwzIHoiIGZpbGw9IiMzMzMiIC8+CiAgICA8L21hcmtlcj4KICA8L2RlZnM+CiAgPHN0eWxlPgogICAgdGV4dCB7IGZvbnQtZmFtaWx5OiAnQ29taWMgU2FucyBNUycsICdDaGFsa2JvYXJkIFNFJywgc2Fucy1zZXJpZjsgZm9udC1zaXplOiAxNnB4OyBmaWxsOiAjMzMzOyB9CiAgICBwYXRoLCByZWN0IHsgc3Ryb2tlOiAjMzMzOyBzdHJva2Utd2lkdGg6IDI7IGZpbGw6IG5vbmU7IHN0cm9rZS1saW5lY2FwOiByb3VuZDsgc3Ryb2tlLWxpbmVqb2luOiByb3VuZDsgfQogIDwvc3R5bGU+CiAgCiAgPCEtLSBJbnB1dCAtLT4KICA8cmVjdCB4PSI1MCIgeT0iMTg1IiB3aWR0aD0iNjAiIGhlaWdodD0iNjAiIHJ4PSI1IiAvPgogIDx0ZXh0IHg9IjU1IiB5PSIyMjAiPklucHV0PC90ZXh0PgogIDx0ZXh0IHg9IjQ1IiB5PSIyNjUiIHN0eWxlPSJmb250LXNpemU6MTJweCI+KHgsIGluX2NoKQo8L3RleHQ+CgogIDwhLS0gQXJyb3cgLS0+CiAgPHBhdGggZD0iTTEyMCAyMTUgSCAxNjAiIG1hcmtlci1lbmQ9InVybCgjYXJyb3cpIiAvPgogIDwhLS0gUmVzdG9uYWwgQmxvY2sgQm94IC0tPgogIDxyZWN0IHg9IjE3MCIgeT0iOTAiIHdpZHRoPSIyODAiIGhlaWdodD0iMjUwIiBzdHJva2Utd2lkdGg9IjUiIHN0cm9rZT0iIzY2NiIgLz4KICA8dGV4dCB4PSIxODAiIHk9IjgwIiBzdHlsZT0iZmlsbDojNjY2Ij5Cb3R0bGVuZW1jIEJsb2NrPC90ZXh0PgogIDwhLS0gQ29udjEgLS0+CiAgPHJlY3QgeD0iMTkwIiB5PSIxMTAiIHdpZHRoPSI4MCIgaGVpZ2h0PSI0MCIgLz4KICA8dGV4dCB4PSIyMDUiIHk9IjEzNSI+Q29udjE8L3RleHQ+CiAgPHRleHQgeD0iMjg1IiB5PSIxMzUiIHN0eWxlPSJmb250LXNpemU6MTJweCI+MXgxPC90ZXh0PgoKICA8IS0tIEFycm93IC0tPgogIDxwYXRoIGQ9Ik0yMzAgMTU1IFYgMTgwIiBtYXJrZXItZW5kPSJ1cmwoI2Fycm93KSIgLz4KICA8IS0tIENvbnYgMyAtLT4KICA8cmVjdCB4PSIxOTAiIHk9IjE5MCIgd2lkdGg9IjgwIiBoZWlnaHQ9IjQwIiAvPgogIDx0ZXh0IHg9IjIwNSIgeT0iMjE1Ij5Db252MzwvdGV4dD4KICA8dGV4dCB4PSIyODUiIHk9IjIxNSIgc3R5bGU9ImZvbnQtc2l6ZToxMnB4Ij4xeDE8L3RleHQ+CgogIDwhLS0gQXJyb3cgLS0+CiAgPHBhdGggZD0iTTIzMCAyMzUgViAyNjAiIG1hcmtlci1lbmQ9InVybCgjYXJyb3cpIiAvPgogIDwhLS0gQ29udiAzIC0tPgogIDxyZWN0IHg9IjE5MCIgeT0iMjcwIiB3aWR0aD0iODAiIGhlaWdodD0iNDAiIC8+CiAgPHRleHQgeD0iMjA1IiB5PSIyOTUiPkNvbnYzPC90ZXh0PgogIDx0ZXh0IHg9IjIwNSIgeT0iMjk1IiBzdHlsZT0iZm9udC1zaXplOjEycHgiPjF4MTwvdGV4dD4KCiAgPCEtLSBTa2lwIENvbm5lY3Rpb24gLS0+CiAgPHBhdGggZD0iTTE2MCAyMTUgViAzNTAgSCAzODAiIHN0eWxlPSJzdHJva2U6ICMyMmM1NWU7IiAvPgogIDx0ZXh0IHg9IjIwMCIgeT0iMzcwIiBzdHlsZT0iZmlsbDojMjJjNTVlOyBmb250LXNpemU6MTJweCI+SWRlbnRpdHkgKFNraXApPC90ZXh0PgoKICA8IS0tIFJlbHUgLyBBZGQgLS0+CiAgPGNpcmNsZSBjeD0iNDAwIiBjeT0iMjkwIiByPSIxNSIgLz4KICA8dGV4dCB4PSIzOTMiIHk9IjI5NSIgc3R5bGU9ImZvbnQtd2VpZ2h0OmJvbGQiPis8L3RleHQ+CgogIDwhLS0gQXJyb3cgLS0+CiAgPHBhdGggZD0iTTI3MCAyOTAgSCAzODAiIG1hcmtlci1lbmQ9InVybCgjYXJyb3cpIiAvPgogIDxwYXRoIGQ9Ik00MDAgMzUwIFYgMzEwIiBtYXJrZXItZW5kPSJ1cmwoI2Fycm93KSIgLz4KICA8IS0tIE91dHB1dCAtLT4KICA8cGF0aCBkPSJNNDE1IDI5MCBIIDQ2MCIgbWFya2VyLWVuZD0idXJsKCNhcnJvdykiIC8+CiAgPHJlY3QgeD0iNDYwIiB5PSIyNjUiIHdpZHRoPSI2MCIgaGVpZ2h0PSI1MCIgLz4KICA8dGV4dCB4PSI0NzAiIHk9IjI5NSI+T3V0PC90ZXh0Pgo8L3N2Zz4=`;
