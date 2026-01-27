@@ -180,6 +180,41 @@
             </div>
         </div>
 
+        <!-- AI FinOps Advisor Section -->
+        <div class="mt-12 bg-gradient-to-r from-purple-900/30 to-blue-900/30 border border-purple-500/30 rounded-2xl p-6 green-glow">
+            <div class="flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
+                <div class="flex items-center gap-4">
+                    <div class="w-14 h-14 bg-purple-500/20 rounded-xl flex items-center justify-center border border-purple-500/30">
+                        <span class="text-2xl">🤖</span>
+                    </div>
+                    <div>
+                        <h3 class="text-lg font-bold text-white flex items-center gap-2">
+                            AI FinOps Advisor
+                            <span class="bg-purple-500 text-white text-[10px] px-2 py-0.5 rounded-full font-bold">BETA</span>
+                        </h3>
+                        <p class="text-sm text-gray-400">Ask questions about cost optimization, architecture, and ROI</p>
+                    </div>
+                </div>
+                <button onclick="openAdvisorChat()" 
+                        class="inline-flex items-center gap-2 bg-purple-600 hover:bg-purple-500 text-white font-semibold px-6 py-3 rounded-lg transition shadow-lg shadow-purple-900/30">
+                    💬 Start Consultation
+                </button>
+            </div>
+            
+            <!-- Quick Questions -->
+            <div class="mt-4 flex flex-wrap gap-2">
+                <button onclick="askQuickQuestion('roi')" class="text-xs bg-slate-700/50 hover:bg-slate-600 text-gray-300 px-3 py-1.5 rounded-full border border-slate-600 transition">
+                    💰 How to reduce costs?
+                </button>
+                <button onclick="askQuickQuestion('architecture')" class="text-xs bg-slate-700/50 hover:bg-slate-600 text-gray-300 px-3 py-1.5 rounded-full border border-slate-600 transition">
+                    🏗️ Architecture best practices
+                </button>
+                <button onclick="askQuickQuestion('carbon')" class="text-xs bg-slate-700/50 hover:bg-slate-600 text-gray-300 px-3 py-1.5 rounded-full border border-slate-600 transition">
+                    🌱 Carbon reduction tips
+                </button>
+            </div>
+        </div>
+
         <!-- CTA -->
         <div class="mt-12 text-center">
             <p class="text-gray-400 mb-4">Want automated cost checks in your CI/CD pipeline?</p>
@@ -195,6 +230,115 @@
             </div>
         </div>
     </main>
+
+    <!-- AI FinOps Advisor Modal -->
+    <div id="advisorModal" class="fixed inset-0 bg-black/80 hidden items-center justify-center z-50 p-4">
+        <div class="bg-slate-900 border border-purple-500/30 w-full max-w-4xl h-[80vh] rounded-2xl shadow-2xl flex overflow-hidden">
+            
+            <!-- Sidebar -->
+            <div class="hidden md:flex w-64 bg-slate-950 border-r border-slate-700 p-6 flex-col justify-between">
+                <div>
+                    <div class="flex items-center gap-2 mb-6">
+                        <span class="text-2xl">🤖</span>
+                        <h2 class="font-bold text-white tracking-tight">AI Advisor</h2>
+                    </div>
+                    
+                    <div class="space-y-4">
+                        <div class="p-3 bg-slate-800 rounded-lg border border-slate-700">
+                            <h3 class="text-xs font-bold text-gray-400 uppercase mb-2">Knowledge Base</h3>
+                            <ul class="space-y-2 text-xs text-gray-300">
+                                <li class="flex items-center gap-2"><span class="text-green-400">✓</span> Hardware Grounding</li>
+                                <li class="flex items-center gap-2"><span class="text-green-400">✓</span> 2026 GPU Specs</li>
+                                <li class="flex items-center gap-2"><span class="text-green-400">✓</span> FinOps Best Practices</li>
+                            </ul>
+                        </div>
+
+                        <div class="p-3 bg-slate-800/50 rounded-lg border border-slate-700">
+                            <div class="flex items-center justify-between mb-2">
+                                <h3 class="text-xs font-bold text-gray-400 uppercase">Daily Quota</h3>
+                                <span class="text-xs text-gray-500">🕐</span>
+                            </div>
+                            <div class="flex items-baseline gap-1">
+                                <span id="remainingQuota" class="text-2xl font-bold text-green-400">7</span>
+                                <span class="text-xs text-gray-500">/ 7 left today</span>
+                            </div>
+                        </div>
+
+                        <div class="p-3 bg-purple-900/20 rounded-lg border border-purple-500/20">
+                            <h3 class="text-xs font-bold text-purple-400 uppercase mb-2">Pro Features</h3>
+                            <p class="text-[10px] text-gray-400 leading-relaxed mb-3">
+                                Unlimited consultations, custom reports, and priority support.
+                            </p>
+                            <a href="https://github.com/hongping-zh/ecocompute-ai" 
+                               class="block w-full py-1.5 bg-purple-600 hover:bg-purple-500 text-white text-xs font-bold rounded text-center transition">
+                                Learn More
+                            </a>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="text-[10px] text-gray-600 text-center">
+                    Powered by EcoCompute AI
+                </div>
+            </div>
+
+            <!-- Chat Area -->
+            <div class="flex-1 flex flex-col bg-slate-900">
+                <!-- Header -->
+                <div class="h-16 border-b border-slate-700 flex items-center justify-between px-6 bg-slate-950/50">
+                    <div>
+                        <h3 class="text-white font-bold flex items-center gap-2">
+                            AI FinOps Advisor
+                            <span class="bg-green-500 text-black text-[10px] px-1.5 py-0.5 rounded font-bold">LIVE</span>
+                        </h3>
+                        <p class="text-xs text-gray-500">Expert guidance on AI cost optimization</p>
+                    </div>
+                    <button onclick="closeAdvisorChat()" class="p-2 hover:bg-slate-800 rounded-full text-gray-400 transition">
+                        <span class="text-xl">&times;</span>
+                    </button>
+                </div>
+
+                <!-- Messages -->
+                <div id="chatMessages" class="flex-1 overflow-y-auto p-6 space-y-4">
+                    <!-- Welcome message -->
+                    <div class="flex gap-3">
+                        <div class="w-8 h-8 rounded-full bg-purple-500/20 flex items-center justify-center shrink-0 border border-purple-500/30">
+                            <span>🤖</span>
+                        </div>
+                        <div class="max-w-[80%] rounded-2xl rounded-tl-none p-4 bg-slate-800 text-gray-200 border border-slate-700 text-sm">
+                            <p>Welcome to the AI FinOps Advisor! I can help you with:</p>
+                            <ul class="mt-2 space-y-1 text-gray-400">
+                                <li>• Cost optimization strategies</li>
+                                <li>• Architecture best practices</li>
+                                <li>• Carbon footprint reduction</li>
+                                <li>• Hardware selection guidance</li>
+                            </ul>
+                            <p class="mt-2">What would you like to know?</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Input -->
+                <div class="p-4 border-t border-slate-700 bg-slate-950">
+                    <div class="relative flex items-center gap-2 bg-slate-800 border border-slate-600 rounded-xl p-2 focus-within:border-purple-500 transition">
+                        <input 
+                            type="text" 
+                            id="advisorInput"
+                            placeholder="Ask about cost optimization, architecture, ROI..."
+                            class="flex-1 bg-transparent text-sm text-white px-3 focus:outline-none"
+                            onkeydown="if(event.key === 'Enter') sendAdvisorMessage()"
+                        />
+                        <button 
+                            onclick="sendAdvisorMessage()"
+                            class="p-2 bg-purple-600 hover:bg-purple-500 text-white rounded-lg transition"
+                        >
+                            <span>➤</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
 
     <!-- Citation Modal -->
     <div id="citeModal" class="fixed inset-0 bg-black/70 hidden items-center justify-center z-50 p-4">
@@ -442,8 +586,325 @@
         document.addEventListener('keydown', function(e) {
             if (e.key === 'Escape') {
                 closeCiteModal();
+                closeAdvisorChat();
             }
         });
+
+        // ========== AI FinOps Advisor Functions ==========
+        
+        const ADVISOR_RESPONSES = {
+            'roi': `**Cost Optimization Strategies**
+
+Here are the top ways to reduce your AI training costs:
+
+1. **Use Mixed Precision (FP16/BF16)**
+   - Reduces memory by 50%
+   - Speeds up training by 30-50%
+   - Minimal accuracy loss (<0.1%)
+
+2. **Optimize Batch Size**
+   - Larger batches = better GPU utilization
+   - Use gradient accumulation if memory-limited
+
+3. **Choose the Right GPU**
+   - H100: Best for large models (>7B params)
+   - A100: Sweet spot for most workloads
+   - T4/L4: Great for inference and fine-tuning
+
+4. **Use Spot/Preemptible Instances**
+   - 60-90% cost savings
+   - Good for fault-tolerant training
+
+5. **Regional Arbitrage**
+   - US-East vs EU-North can differ by 20%
+   - Consider carbon intensity too!
+
+**Typical Savings: 30-50% reduction in cloud costs**`,
+
+            'architecture': `**Architecture Best Practices**
+
+For efficient AI training, follow these guidelines:
+
+**1. Model Architecture**
+- Use FlashAttention-2 for transformers (2-4x speedup)
+- Consider MoE (Mixture of Experts) for large models
+- Implement gradient checkpointing for memory savings
+
+**2. Data Pipeline**
+- Prefetch data to avoid GPU idle time
+- Use WebDataset or similar for distributed training
+- Tokenize offline, not during training
+
+**3. Distributed Training**
+- FSDP > DDP for large models
+- Use tensor parallelism for >13B models
+- Pipeline parallelism for extreme scale
+
+**4. Hardware Selection**
+| Model Size | Recommended GPU | Why |
+|------------|-----------------|-----|
+| <1B | A100 40GB | Cost-effective |
+| 1-7B | A100 80GB | Memory headroom |
+| 7-70B | H100 SXM | NVLink bandwidth |
+| >70B | H100 cluster | Multi-node required |
+
+**5. Monitoring**
+- Track GPU utilization (target >90%)
+- Monitor memory bandwidth usage
+- Set up cost alerts`,
+
+            'carbon': `**Carbon Footprint Reduction**
+
+Reduce your AI's environmental impact:
+
+**1. Choose Green Regions**
+| Region | Carbon Intensity | Savings vs US-East |
+|--------|------------------|-------------------|
+| EU North (Sweden) | 20 gCO₂/kWh | -95% |
+| EU West | 300 gCO₂/kWh | -25% |
+| US West | 350 gCO₂/kWh | -12% |
+| US East | 400 gCO₂/kWh | baseline |
+| Asia East | 550 gCO₂/kWh | +37% |
+
+**2. Optimize Efficiency**
+- Every 1% efficiency gain = 1% carbon reduction
+- Use the techniques from cost optimization
+
+**3. Schedule Wisely**
+- Train during low-carbon hours (night in most regions)
+- Use carbon-aware schedulers
+
+**4. Right-size Your Training**
+- Do you really need 2T tokens?
+- Consider curriculum learning
+- Early stopping saves energy
+
+**5. Offset Responsibly**
+- Calculate your footprint first
+- Use verified carbon credits
+- Invest in renewable energy
+
+**Impact**: Training in Sweden vs China can reduce carbon by **95%**`,
+
+            'default': `Great question! Let me help you with that.
+
+**EcoCompute AI** helps you optimize AI training in three ways:
+
+1. **Cost Prediction** — Know your costs before training
+2. **Carbon Tracking** — Measure environmental impact
+3. **Optimization Tips** — Actionable recommendations
+
+**Key Features:**
+- MLPerf-calibrated predictions (<5% error)
+- Support for H100, A100, V100, T4, L4
+- Regional carbon intensity data
+- CI/CD integration via GitHub Action
+
+Would you like to know more about:
+- 💰 Cost optimization strategies
+- 🏗️ Architecture best practices
+- 🌱 Carbon reduction tips
+
+Just ask!`
+        };
+
+        let advisorQuota = 7;
+        const QUOTA_KEY = 'advisor_quota';
+        const QUOTA_DATE_KEY = 'advisor_quota_date';
+
+        function initQuota() {
+            const today = new Date().toISOString().split('T')[0];
+            const storedDate = localStorage.getItem(QUOTA_DATE_KEY);
+            
+            if (storedDate !== today) {
+                localStorage.setItem(QUOTA_DATE_KEY, today);
+                localStorage.setItem(QUOTA_KEY, '7');
+                advisorQuota = 7;
+            } else {
+                advisorQuota = parseInt(localStorage.getItem(QUOTA_KEY) || '7');
+            }
+            updateQuotaDisplay();
+        }
+
+        function updateQuotaDisplay() {
+            const quotaEl = document.getElementById('remainingQuota');
+            if (quotaEl) {
+                quotaEl.textContent = advisorQuota;
+                quotaEl.className = advisorQuota > 0 
+                    ? 'text-2xl font-bold text-green-400' 
+                    : 'text-2xl font-bold text-red-400';
+            }
+        }
+
+        function decrementQuota() {
+            if (advisorQuota > 0) {
+                advisorQuota--;
+                localStorage.setItem(QUOTA_KEY, advisorQuota.toString());
+                updateQuotaDisplay();
+            }
+        }
+
+        function openAdvisorChat() {
+            initQuota();
+            const modal = document.getElementById('advisorModal');
+            modal.classList.remove('hidden');
+            modal.classList.add('flex');
+            document.getElementById('advisorInput').focus();
+        }
+
+        function closeAdvisorChat() {
+            const modal = document.getElementById('advisorModal');
+            modal.classList.add('hidden');
+            modal.classList.remove('flex');
+        }
+
+        function askQuickQuestion(topic) {
+            openAdvisorChat();
+            setTimeout(() => {
+                const input = document.getElementById('advisorInput');
+                const questions = {
+                    'roi': 'How can I reduce my AI training costs?',
+                    'architecture': 'What are the best practices for AI architecture?',
+                    'carbon': 'How can I reduce my carbon footprint?'
+                };
+                input.value = questions[topic] || '';
+                sendAdvisorMessage();
+            }, 300);
+        }
+
+        function getAdvisorResponse(message) {
+            const lowerMsg = message.toLowerCase();
+            
+            if (lowerMsg.includes('cost') || lowerMsg.includes('save') || lowerMsg.includes('money') || 
+                lowerMsg.includes('reduce') || lowerMsg.includes('roi') || lowerMsg.includes('价') || lowerMsg.includes('省')) {
+                return ADVISOR_RESPONSES['roi'];
+            }
+            if (lowerMsg.includes('architect') || lowerMsg.includes('best practice') || 
+                lowerMsg.includes('design') || lowerMsg.includes('structure') || lowerMsg.includes('架构')) {
+                return ADVISOR_RESPONSES['architecture'];
+            }
+            if (lowerMsg.includes('carbon') || lowerMsg.includes('green') || lowerMsg.includes('environment') || 
+                lowerMsg.includes('co2') || lowerMsg.includes('emission') || lowerMsg.includes('碳')) {
+                return ADVISOR_RESPONSES['carbon'];
+            }
+            return ADVISOR_RESPONSES['default'];
+        }
+
+        async function sendAdvisorMessage() {
+            const input = document.getElementById('advisorInput');
+            const message = input.value.trim();
+            if (!message) return;
+
+            if (advisorQuota <= 0) {
+                addChatMessage('model', "You've reached your daily limit of 7 free consultations. Please come back tomorrow or upgrade to Pro for unlimited access.");
+                return;
+            }
+
+            // Add user message
+            addChatMessage('user', message);
+            input.value = '';
+            decrementQuota();
+
+            // Show typing indicator
+            const typingId = addTypingIndicator();
+
+            // Simulate response delay
+            await new Promise(resolve => setTimeout(resolve, 800));
+
+            // Remove typing indicator
+            removeTypingIndicator(typingId);
+
+            // Get and display response with streaming effect
+            const response = getAdvisorResponse(message);
+            await streamResponse(response);
+        }
+
+        function addChatMessage(role, text) {
+            const container = document.getElementById('chatMessages');
+            const msgDiv = document.createElement('div');
+            msgDiv.className = `flex gap-3 ${role === 'user' ? 'justify-end' : 'justify-start'}`;
+            
+            if (role === 'model') {
+                msgDiv.innerHTML = `
+                    <div class="w-8 h-8 rounded-full bg-purple-500/20 flex items-center justify-center shrink-0 border border-purple-500/30">
+                        <span>🤖</span>
+                    </div>
+                    <div class="max-w-[80%] rounded-2xl rounded-tl-none p-4 bg-slate-800 text-gray-200 border border-slate-700 text-sm whitespace-pre-wrap">${text}</div>
+                `;
+            } else {
+                msgDiv.innerHTML = `
+                    <div class="max-w-[80%] rounded-2xl rounded-tr-none p-4 bg-purple-600 text-white text-sm">${text}</div>
+                    <div class="w-8 h-8 rounded-full bg-slate-700 flex items-center justify-center shrink-0">
+                        <span>👤</span>
+                    </div>
+                `;
+            }
+            
+            container.appendChild(msgDiv);
+            container.scrollTop = container.scrollHeight;
+            return msgDiv;
+        }
+
+        function addTypingIndicator() {
+            const container = document.getElementById('chatMessages');
+            const typingDiv = document.createElement('div');
+            typingDiv.id = 'typingIndicator';
+            typingDiv.className = 'flex gap-3';
+            typingDiv.innerHTML = `
+                <div class="w-8 h-8 rounded-full bg-purple-500/20 flex items-center justify-center shrink-0 border border-purple-500/30">
+                    <span>🤖</span>
+                </div>
+                <div class="flex items-center gap-1 bg-slate-800 px-4 py-3 rounded-2xl rounded-tl-none border border-slate-700">
+                    <div class="w-2 h-2 bg-gray-500 rounded-full animate-bounce" style="animation-delay: 0ms"></div>
+                    <div class="w-2 h-2 bg-gray-500 rounded-full animate-bounce" style="animation-delay: 150ms"></div>
+                    <div class="w-2 h-2 bg-gray-500 rounded-full animate-bounce" style="animation-delay: 300ms"></div>
+                </div>
+            `;
+            container.appendChild(typingDiv);
+            container.scrollTop = container.scrollHeight;
+            return 'typingIndicator';
+        }
+
+        function removeTypingIndicator(id) {
+            const el = document.getElementById(id);
+            if (el) el.remove();
+        }
+
+        async function streamResponse(text) {
+            const container = document.getElementById('chatMessages');
+            const msgDiv = document.createElement('div');
+            msgDiv.className = 'flex gap-3';
+            msgDiv.innerHTML = `
+                <div class="w-8 h-8 rounded-full bg-purple-500/20 flex items-center justify-center shrink-0 border border-purple-500/30">
+                    <span>🤖</span>
+                </div>
+                <div id="streamingText" class="max-w-[80%] rounded-2xl rounded-tl-none p-4 bg-slate-800 text-gray-200 border border-slate-700 text-sm whitespace-pre-wrap"></div>
+            `;
+            container.appendChild(msgDiv);
+
+            const textEl = document.getElementById('streamingText');
+            const words = text.split(' ');
+            let accumulated = '';
+
+            for (let i = 0; i < words.length; i++) {
+                accumulated += (i === 0 ? '' : ' ') + words[i];
+                textEl.innerHTML = accumulated;
+                container.scrollTop = container.scrollHeight;
+                await new Promise(resolve => setTimeout(resolve, 15));
+            }
+
+            textEl.removeAttribute('id');
+        }
+
+        // Close advisor modal on outside click
+        document.getElementById('advisorModal').addEventListener('click', function(e) {
+            if (e.target === this) {
+                closeAdvisorChat();
+            }
+        });
+
+        // Initialize quota on page load
+        initQuota();
     </script>
 </body>
 </html>
