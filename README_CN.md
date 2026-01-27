@@ -71,6 +71,17 @@ graph TD
 - **L2 路由器**：仅在需要时将复杂案例路由到昂贵模型
 - **L3 硬件校准**：基于 MLPerf 基准校准，**误差 <5%** — [📖 技术详解](docs/HARDWARE_GROUNDING.md)
 
+### 📄 研究与方法论
+
+我们的 **L3 硬件校准** 方法论已发表于 **TechRxiv (IEEE)**：
+
+[![DOI](https://img.shields.io/badge/TechRxiv-Preprint-blue)](https://www.techrxiv.org/users/1022807/articles/1382748-ecocompute-ai-a-high-fidelity-analytical-framework-for-quantifying-and-optimizing-energy-economic-impacts-of-large-scale-ai)
+
+如果您在研究中使用本工具，请引用：
+```text
+Zhang, H. (2025). EcoCompute AI: A High-Fidelity Analytical Framework for Quantifying and Optimizing Energy-Economic Impacts of Large-Scale AI. TechRxiv.
+```
+
 ### 🔬 硬件基准校准：为什么我们的预测准确
 
 与理论估算不同，EcoCompute 使用**基于物理模型并经 MLPerf 基准校准**的方法：

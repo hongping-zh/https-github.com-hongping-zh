@@ -71,6 +71,17 @@ We use a **Tiered Gatekeeper** to maximize ROI:
 - **L2 Router**: Routes complex cases to expensive models only when needed
 - **L3 Hardware Grounding**: Calibrated on MLPerf baselines for **<5% error margin** — [📖 Technical Deep Dive](docs/HARDWARE_GROUNDING.md)
 
+### 📄 Research & Methodology
+
+Our methodology for **L3 Hardware Grounding** is published on **TechRxiv (IEEE)**:
+
+[![DOI](https://img.shields.io/badge/TechRxiv-Preprint-blue)](https://www.techrxiv.org/users/1022807/articles/1382748-ecocompute-ai-a-high-fidelity-analytical-framework-for-quantifying-and-optimizing-energy-economic-impacts-of-large-scale-ai)
+
+If you use this tool in your research, please cite:
+```text
+Zhang, H. (2025). EcoCompute AI: A High-Fidelity Analytical Framework for Quantifying and Optimizing Energy-Economic Impacts of Large-Scale AI. TechRxiv.
+```
+
 ### 🔬 Hardware Grounding: Why Our Predictions Are Accurate
 
 Unlike theoretical estimates, EcoCompute uses a **physics-based model calibrated against real MLPerf benchmarks**:
