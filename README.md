@@ -14,7 +14,7 @@
 
 **The CI/CD Gatekeeper that catches expensive AI code before it hits production.**
 
-[🚀 Try Live Demo](https://ecocompute-ai-elb0yplu9w.edgeone.dev/) · [🧮 Cost Calculator](https://hongping-zh.github.io/ecocompute-ai/calculator/) · [Report Bug](https://github.com/hongping-zh/ecocompute-ai/issues)
+[🚀 Try Live Demo](https://ecocompute-ai-elb0yplu9w.edgeone.dev/) · [🧮 Cost Calculator](https://hongping-zh.github.io/ecocompute-ai/calculator/) · [📄 Technical Paper](paper/EcoCompute_AI_Technical_Report.pdf) · [Report Bug](https://github.com/hongping-zh/ecocompute-ai/issues)
 
 </div>
 

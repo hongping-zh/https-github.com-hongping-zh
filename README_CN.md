@@ -14,7 +14,7 @@
 
 **在代码进入生产环境之前，拦截高成本 AI 代码的 CI/CD 守门员**
 
-[🚀 在线演示](https://ecocompute-ai-elb0yplu9w.edgeone.dev/) · [🧮 成本计算器](https://hongping-zh.github.io/ecocompute-ai/calculator/) · [报告 Bug](https://github.com/hongping-zh/ecocompute-ai/issues)
+[🚀 在线演示](https://ecocompute-ai-elb0yplu9w.edgeone.dev/) · [🧮 成本计算器](https://hongping-zh.github.io/ecocompute-ai/calculator/) · [📄 技术论文](paper/EcoCompute_AI_Technical_Report.pdf) · [报告 Bug](https://github.com/hongping-zh/ecocompute-ai/issues)
 
 </div>
 
