@@ -122,6 +122,17 @@
                         </div>
                     </div>
 
+                    <!-- Precision/Quantization -->
+                    <div>
+                        <label class="block text-sm text-gray-400 mb-2">Precision / Quantization</label>
+                        <select id="quantization" class="w-full bg-slate-700 rounded-lg px-4 py-3 text-white focus:ring-2 focus:ring-green-500 outline-none">
+                            <option value="fp16" selected>FP16 (Half Precision)</option>
+                            <option value="bf16">BF16 (Brain Float)</option>
+                            <option value="int8">INT8 (8-bit Quantization)</option>
+                            <option value="int4">INT4 / NF4 (4-bit Quantization)</option>
+                        </select>
+                    </div>
+
                     <!-- Region -->
                     <div>
                         <label class="block text-sm text-gray-400 mb-2">Cloud Region</label>
@@ -132,6 +143,24 @@
                             <option value="eu-north">EU North - Sweden (20 gCO₂/kWh)</option>
                             <option value="asia-east">Asia East (550 gCO₂/kWh)</option>
                         </select>
+                    </div>
+
+                    <!-- EcoCompute Insight Warning -->
+                    <div id="quantWarning" class="hidden bg-yellow-900/30 border border-yellow-600/50 rounded-xl p-4">
+                        <div class="flex items-start gap-3">
+                            <span class="text-xl">💡</span>
+                            <div>
+                                <div class="text-sm font-semibold text-yellow-400 mb-1">EcoCompute Insight</div>
+                                <p class="text-sm text-yellow-200/80">
+                                    On high-end GPUs like RTX 5090, <strong>4-bit quantization for models &lt;3B parameters may increase energy consumption by ~26%</strong> due to de-quantization overhead. We recommend using FP16 for better energy efficiency.
+                                </p>
+                                <a href="https://github.com/bitsandbytes-foundation/bitsandbytes/issues/1851" 
+                                   target="_blank" 
+                                   class="inline-block mt-2 text-xs text-yellow-400 hover:underline">
+                                    📊 See our benchmark data →
+                                </a>
+                            </div>
+                        </div>
                     </div>
                 </div>
 
@@ -542,9 +571,39 @@
         document.getElementById('numGpus').addEventListener('input', calculate);
         document.getElementById('tokens').addEventListener('input', calculate);
         document.getElementById('region').addEventListener('change', calculate);
+        document.getElementById('quantization').addEventListener('change', checkQuantizationWarning);
+        document.getElementById('modelType').addEventListener('change', checkQuantizationWarning);
+
+        // Smart Warning Logic: Show warning when Model < 3B AND Quantization = 4-bit
+        function checkQuantizationWarning() {
+            const modelType = document.getElementById('modelType').value;
+            const quantization = document.getElementById('quantization').value;
+            const warningEl = document.getElementById('quantWarning');
+            
+            // Models under 3B parameters
+            const smallModels = [
+                'transformer-small',  // 125M
+                'transformer-medium', // 350M
+                'transformer-large',  // 1.3B
+                'resnet-50',
+                'resnet-152',
+                'bert-base',
+                'bert-large'
+            ];
+            
+            const isSmallModel = smallModels.includes(modelType);
+            const is4bit = quantization === 'int4';
+            
+            if (isSmallModel && is4bit) {
+                warningEl.classList.remove('hidden');
+            } else {
+                warningEl.classList.add('hidden');
+            }
+        }
 
         // Initial calculation
         calculate();
+        checkQuantizationWarning();
 
         // Citation Modal Functions
         function openCiteModal() {
